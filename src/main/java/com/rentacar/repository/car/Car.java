@@ -4,9 +4,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 
 @Entity
 public class Car {
@@ -14,34 +11,14 @@ public class Car {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int ID;
 
-    @NotEmpty(message = "Car's brand name may not be null or empty")
     private String brandName;
-
-    @NotEmpty(message = "Car's name may not be null or empty")
     private String name;
-
-    @NotNull(message = "Car's first registration may not be null")
-    @Positive(message = "Car's first registration may not be negative or zero")
     private Integer firstRegistration;
-
-    @NotNull(message = "Car's engine capacity may not be null")
-    @Positive(message = "Car's engine capacity may not be negative or zero")
     private Double engineCapacity;
-
-    @NotNull(message = "Car's power may not be null")
-    @Positive(message = "Car's power may not be negative or zero")
     private Integer horsePower;
-
-    @NotEmpty(message = "Car's fuel may not be null or empty")
     private String fuel;
-
-    @NotEmpty(message = "Car's km may not be null or empty")
     private String mileage;
-
-    @NotEmpty(message = "Car's gearbox may not be null or empty")
     private String gearbox;
-
-//    @NotNull(message = "Car's availability may not be null")
 //    private Boolean available;
 
 
