@@ -22,7 +22,7 @@ public class TestCarRepository {
             .setFirstRegistration(1999)
             .setEngineCapacity(1)
             .setFuel("test")
-            .setMileage("0")
+            .setMileage(0d)
             .setGearbox("test");
 
     private final Car baseCar = CarAdapter.fromDTO(baseCarDTO);

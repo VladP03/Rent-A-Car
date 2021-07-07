@@ -25,14 +25,16 @@ public class CarDTO {
     private Integer firstRegistration;
 
     @NotNull(message = "Car's engine capacity may not be null")
-    @Positive(message = "Car's engine capacity may not be negative or zero")
+    @Min(value = 0, message = "Car's engine may not be negative")
+    @Max(value = 9999, message = "Car's engine may not be greater than 9999")
     private Integer engineCapacity;
 
     @NotEmpty(message = "Car's fuel may not be null or empty")
     private String fuel;
 
-    @NotEmpty(message = "Car's km may not be null or empty")
-    private String mileage;
+    @NotNull(message = "Car's km may not be null")
+    @Positive(message = "Car's km can not be negative")
+    private Double mileage;
 
     @NotEmpty(message = "Car's gearbox may not be null or empty")
     private String gearbox;
@@ -99,11 +101,11 @@ public class CarDTO {
         return this;
     }
 
-    public String getMileage() {
+    public Double getMileage() {
         return mileage;
     }
 
-    public CarDTO setMileage(String mileage) {
+    public CarDTO setMileage(Double mileage) {
         this.mileage = mileage;
         return this;
     }

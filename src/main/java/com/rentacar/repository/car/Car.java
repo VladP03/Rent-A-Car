@@ -15,7 +15,7 @@ public class Car {
     private Integer firstRegistration;
     private Integer engineCapacity;
     private String fuel;
-    private String mileage;
+    private Double mileage;
     private String gearbox;
 
 
@@ -85,11 +85,11 @@ public class Car {
         return this;
     }
 
-    public String getMileage() {
+    public Double getMileage() {
         return mileage;
     }
 
-    public Car setMileage(String mileage) {
+    public Car setMileage(Double mileage) {
         this.mileage = mileage;
         return this;
     }

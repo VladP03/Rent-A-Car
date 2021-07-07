@@ -32,4 +32,25 @@ public class ExceptionsHandlerAdvice extends ResponseEntityExceptionHandler {
     public ApiError onCarAlreadyExistsException(CarAlreadyExistsException exception) {
         return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage());
     }
+
+    @ExceptionHandler(CarFirstRegistrationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ApiError onCarFirstRegistrationException(CarFirstRegistrationException exception) {
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(CarFuelException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ApiError onCarFuelException(CarFuelException exception) {
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(CarGearboxException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ApiError onCarGearboxException(CarGearboxException exception) {
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage());
+    }
 }

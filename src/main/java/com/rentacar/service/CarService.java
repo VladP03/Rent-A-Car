@@ -6,8 +6,7 @@ import com.rentacar.model.CarDTO;
 import com.rentacar.model.adapters.CarAdapter;
 import com.rentacar.model.validations.OnCreate;
 import com.rentacar.repository.car.CarRepository;
-import com.rentacar.service.exceptions.CarAlreadyExistsException;
-import com.rentacar.service.exceptions.CarNotFoundException;
+import com.rentacar.service.exceptions.*;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -41,11 +40,57 @@ public class CarService {
     }
 
     @Validated(OnCreate.class)
-    public CarDTO createCar(@Valid CarDTO car) {
-        if (carRepository.findByVIN(car.getVIN()) != null) {
+    public CarDTO createCar(@Valid CarDTO carDTO) {
+        namesToUpper(carDTO);
+
+        checkIfCarAlreadyExists(carDTO);
+        checkFirstRegistration(carDTO);
+        checkFuel(carDTO);
+        checkGearbox(carDTO);
+
+        return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carDTO)));
+    }
+
+
+
+    private void checkIfCarAlreadyExists(CarDTO carDTO) {
+        if (carRepository.findByVIN(carDTO.getVIN()) != null) {
             throw new CarAlreadyExistsException("Car already exists in db.");
         }
+    }
 
-        return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(car)));
+    private void checkFirstRegistration(CarDTO carDTO) {
+        if (carDTO.getFirstRegistration() > Calendar.getInstance().get(Calendar.YEAR)) {
+            throw new CarFirstRegistrationException("Car firstRegistration given is: " + carDTO.getFirstRegistration());
+        } else if (carDTO.getFirstRegistration() < Calendar.getInstance().get(Calendar.YEAR) - 10) {
+            throw new CarFirstRegistrationException("Car firstRegistration given is: " + carDTO.getFirstRegistration());
+        }
+    }
+
+    private void checkFuel(CarDTO carDTO) {
+        List<String> fuelType = new ArrayList<>();
+
+        fuelType.add("GAS");
+        fuelType.add("DIESEL");
+        fuelType.add("HYBRID");
+        fuelType.add("ELECTRIC");
+
+        if (!fuelType.contains(carDTO.getFuel())) {
+            throw new CarFuelException("Car fuel type is incorrect!");
+        }
+    }
+
+    private void checkGearbox(CarDTO carDTO) {
+        if (!carDTO.getGearbox().equals("MANUAL") && !carDTO.getGearbox().equals("AUTOMATIC")) {
+            throw new CarGearboxException("Car gearbox is incorrect");
+        }
+    }
+
+    private void namesToUpper(CarDTO carDTO) {
+        carDTO.setBrandName(carDTO.getBrandName().toUpperCase());
+        carDTO.setName(carDTO.getName().toUpperCase());
+        carDTO.setVIN(carDTO.getVIN().toUpperCase());
+        carDTO.setFuel(carDTO.getFuel().toUpperCase());
+        carDTO.setGearbox(carDTO.getGearbox().toUpperCase());
     }
 }
