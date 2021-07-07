@@ -11,12 +11,21 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.ConstraintViolationException;
+
 @ControllerAdvice
 public class ExceptionsHandlerAdvice extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         return new ResponseEntity<>(new ApiError(status, ex.getMessage()), status);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ApiError onConstraintViolationException(ConstraintViolationException exception) {
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage());
     }
 
     @ExceptionHandler(CarNotFoundException.class)

@@ -73,6 +73,18 @@ public class CarService {
         }
     }
 
+    public CarDTO deleteCar(Integer id) {
+        Optional<Car> carFounded = carRepository.findById(id);
+
+        if (carFounded.isPresent()) {
+            carRepository.deleteById(id);
+
+            return CarAdapter.toDTO(carFounded.get());
+        } else {
+            throw new CarNotFoundException("The car with ID " + id + " doesn't exists in database.");
+        }
+    }
+
 
 
     private void checkIfCarAlreadyExists(CarDTO carDTO) {
