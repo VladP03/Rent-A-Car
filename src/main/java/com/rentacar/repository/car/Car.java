@@ -11,13 +11,12 @@ public class Car {
 
     private String brandName;
     private String name;
+    private String VIN;
     private Integer firstRegistration;
-    private Double engineCapacity;
-    private Integer horsePower;
+    private Integer engineCapacity;
     private String fuel;
     private String mileage;
     private String gearbox;
-//    private Boolean available;
 
 
     public Car() {
@@ -50,6 +49,15 @@ public class Car {
         return this;
     }
 
+    public String getVIN() {
+        return VIN;
+    }
+
+    public Car setVIN(String VIN) {
+        this.VIN = VIN;
+        return this;
+    }
+
     public Integer getFirstRegistration() {
         return firstRegistration;
     }
@@ -59,21 +67,12 @@ public class Car {
         return this;
     }
 
-    public Double getEngineCapacity() {
+    public Integer getEngineCapacity() {
         return engineCapacity;
     }
 
-    public Car setEngineCapacity(Double engineCapacity) {
+    public Car setEngineCapacity(Integer engineCapacity) {
         this.engineCapacity = engineCapacity;
-        return this;
-    }
-
-    public Integer getHorsePower() {
-        return horsePower;
-    }
-
-    public Car setHorsePower(Integer horsePower) {
-        this.horsePower = horsePower;
         return this;
     }
 

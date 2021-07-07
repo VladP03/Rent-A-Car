@@ -4,13 +4,18 @@ import java.util.*;
 
 import com.rentacar.model.CarDTO;
 import com.rentacar.model.adapters.CarAdapter;
+import com.rentacar.model.validations.OnCreate;
 import com.rentacar.repository.car.CarRepository;
+import com.rentacar.service.exceptions.CarAlreadyExistsException;
 import com.rentacar.service.exceptions.CarNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.EntityNotFoundException;
+import javax.validation.Valid;
 
 @Service
+@Validated
 public class CarService {
 
     private final CarRepository carRepository;
@@ -33,5 +38,14 @@ public class CarService {
 
     public List<CarDTO> getCarsWithBrandName(String brandName) {
         return CarAdapter.toListDTO(carRepository.findAllByBrandName(brandName.toUpperCase()));
+    }
+
+    @Validated(OnCreate.class)
+    public CarDTO createCar(@Valid CarDTO car) {
+        if (carRepository.findByVIN(car.getVIN()) != null) {
+            throw new CarAlreadyExistsException("Car already exists in db.");
+        }
+
+        return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(car)));
     }
 }

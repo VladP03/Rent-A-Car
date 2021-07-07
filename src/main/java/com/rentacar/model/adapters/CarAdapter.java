@@ -12,9 +12,9 @@ public class CarAdapter {
                 .setID(car.getID())
                 .setBrandName(car.getBrandName())
                 .setName(car.getName())
+                .setVIN(car.getVIN())
                 .setFirstRegistration(car.getFirstRegistration())
                 .setEngineCapacity(car.getEngineCapacity())
-                .setHorsePower(car.getHorsePower())
                 .setFuel(car.getFuel())
                 .setMileage(car.getMileage())
                 .setGearbox(car.getGearbox());
@@ -25,9 +25,9 @@ public class CarAdapter {
                 .setID(carDTO.getID())
                 .setBrandName(carDTO.getBrandName())
                 .setName(carDTO.getName())
+                .setVIN(carDTO.getVIN())
                 .setFirstRegistration(carDTO.getFirstRegistration())
                 .setEngineCapacity(carDTO.getEngineCapacity())
-                .setHorsePower(carDTO.getHorsePower())
                 .setFuel(carDTO.getFuel())
                 .setMileage(carDTO.getMileage())
                 .setGearbox(carDTO.getGearbox());

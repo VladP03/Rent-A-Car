@@ -7,6 +7,8 @@ import com.rentacar.service.CarService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/v1/cars")
 public class CarController {
@@ -30,5 +32,10 @@ public class CarController {
     @GetMapping("/brand/{brandName}")
     private ResponseEntity<List<CarDTO>> getCarsWithBrandName(@PathVariable String brandName) {
         return ResponseEntity.ok(carService.getCarsWithBrandName(brandName));
+    }
+
+    @PostMapping("/add")
+    private ResponseEntity<CarDTO> createCar(@Valid @RequestBody CarDTO car) {
+        return ResponseEntity.ok(carService.createCar(car));
     }
 }

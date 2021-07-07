@@ -17,17 +17,16 @@ public class CarDTO {
     @NotEmpty(message = "Car's name may not be null or empty")
     private String name;
 
+    @NotEmpty(message = "Car's VIN may not be null or empty")
+    private String VIN;
+
     @NotNull(message = "Car's first registration may not be null")
     @Positive(message = "Car's first registration may not be negative or zero")
     private Integer firstRegistration;
 
     @NotNull(message = "Car's engine capacity may not be null")
     @Positive(message = "Car's engine capacity may not be negative or zero")
-    private Double engineCapacity;
-
-    @NotNull(message = "Car's power may not be null")
-    @Positive(message = "Car's power may not be negative or zero")
-    private Integer horsePower;
+    private Integer engineCapacity;
 
     @NotEmpty(message = "Car's fuel may not be null or empty")
     private String fuel;
@@ -65,6 +64,15 @@ public class CarDTO {
         return this;
     }
 
+    public String getVIN() {
+        return VIN;
+    }
+
+    public CarDTO setVIN(String VIN) {
+        this.VIN = VIN;
+        return this;
+    }
+
     public Integer getFirstRegistration() {
         return firstRegistration;
     }
@@ -73,22 +81,12 @@ public class CarDTO {
         this.firstRegistration = firstRegistration;
         return this;
     }
-
-    public Double getEngineCapacity() {
+    public Integer getEngineCapacity() {
         return engineCapacity;
     }
 
-    public CarDTO setEngineCapacity(Double engineCapacity) {
+    public CarDTO setEngineCapacity(Integer engineCapacity) {
         this.engineCapacity = engineCapacity;
-        return this;
-    }
-
-    public Integer getHorsePower() {
-        return horsePower;
-    }
-
-    public CarDTO setHorsePower(Integer horsePower) {
-        this.horsePower = horsePower;
         return this;
     }
 

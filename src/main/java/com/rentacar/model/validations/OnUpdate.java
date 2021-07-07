@@ -1,2 +1,4 @@
-package com.rentacar.model.validations;public interface OnUpdate {
+package com.rentacar.model.validations;
+
+public interface OnUpdate {
 }
