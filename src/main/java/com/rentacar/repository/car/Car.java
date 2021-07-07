@@ -1,15 +1,13 @@
 package com.rentacar.repository.car;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
+@SequenceGenerator(name = "CarSeq", allocationSize = 1500)
 public class Car {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int ID;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CarSeq")
+    private Integer ID;
 
     private String brandName;
     private String name;
@@ -25,12 +23,11 @@ public class Car {
     public Car() {
     }
 
-
-    public int getID() {
+    public Integer getID() {
         return ID;
     }
 
-    public Car setID(int ID) {
+    public Car setID(Integer ID) {
         this.ID = ID;
         return this;
     }

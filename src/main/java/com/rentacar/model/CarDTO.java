@@ -1,14 +1,15 @@
 package com.rentacar.model;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import com.rentacar.model.validations.OnCreate;
+import com.rentacar.model.validations.OnUpdate;
+
+import javax.validation.constraints.*;
 
 public class CarDTO {
-    @NotNull(message = "Car's ID must be not null")
-    @Min(value = 1, message = "Car's ID must be at least 1")
-    private int ID;
+    @Null(message = "Car's ID must be null", groups = {OnCreate.class})
+    @NotNull(message = "Car's ID must be not null", groups = {OnUpdate.class})
+    @Min(value = 1, message = "Car's ID must be at least 1", groups = {OnUpdate.class})
+    private Integer ID;
 
     @NotEmpty(message = "Car's brand name may not be null or empty")
     private String brandName;
@@ -37,11 +38,11 @@ public class CarDTO {
     @NotEmpty(message = "Car's gearbox may not be null or empty")
     private String gearbox;
 
-    public int getID() {
+    public Integer getID() {
         return ID;
     }
 
-    public CarDTO setID(int ID) {
+    public CarDTO setID(Integer ID) {
         this.ID = ID;
         return this;
     }
