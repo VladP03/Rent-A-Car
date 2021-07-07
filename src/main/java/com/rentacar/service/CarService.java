@@ -73,6 +73,53 @@ public class CarService {
         }
     }
 
+    @Validated(OnUpdate.class)
+    public CarDTO pathcCar(CarDTO carDTO) {
+        Optional<Car> carFounded = carRepository.findById(carDTO.getID());
+
+        if (carFounded.isPresent()) {
+
+            if (carDTO.getBrandName() != null) {
+                carFounded.get().setBrandName(carDTO.getBrandName());
+            }
+
+            if (carDTO.getName() != null) {
+                carFounded.get().setName(carDTO.getName());
+            }
+
+            if (carDTO.getVIN() != null) {
+                carFounded.get().setVIN(carDTO.getVIN());
+            }
+
+            if (carDTO.getFirstRegistration() != null) {
+                checkFirstRegistration(carDTO);
+                carFounded.get().setFirstRegistration(carDTO.getFirstRegistration());
+            }
+
+            if (carDTO.getEngineCapacity() != null) {
+                carFounded.get().setEngineCapacity(carDTO.getEngineCapacity());
+            }
+
+            if (carDTO.getFuel() != null) {
+                checkFuel(carDTO);
+                carFounded.get().setFuel(carDTO.getFuel());
+            }
+
+            if (carDTO.getGearbox() != null) {
+                checkGearbox(carDTO);
+                carFounded.get().setGearbox(carDTO.getGearbox());
+            }
+
+            CarDTO finalCar = CarAdapter.toDTO(carFounded.get());
+            namesToUpper(finalCar);
+            carRepository.save(CarAdapter.fromDTO(finalCar));
+
+            return finalCar;
+        } else {
+            throw new CarNotFoundException("The car with ID " + carDTO.getID() + " doesn't exists in database.");
+        }
+    }
+
     public CarDTO deleteCar(Integer id) {
         Optional<Car> carFounded = carRepository.findById(id);
 
@@ -109,7 +156,7 @@ public class CarService {
         fuelType.add("HYBRID");
         fuelType.add("ELECTRIC");
 
-        if (!fuelType.contains(carDTO.getFuel())) {
+        if (!fuelType.contains(carDTO.getFuel().toUpperCase())) {
             throw new CarFuelException("Car fuel type is incorrect!");
         }
     }
@@ -120,7 +167,7 @@ public class CarService {
         gearBoxType.add("MANUAL");
         gearBoxType.add("AUTOMATIC");
 
-        if (!gearBoxType.contains(carDTO.getGearbox())) {
+        if (!gearBoxType.contains(carDTO.getGearbox().toUpperCase())) {
             throw new CarGearboxException("Car gearbox is incorrect!");
         }
     }

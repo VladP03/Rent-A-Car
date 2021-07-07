@@ -39,7 +39,7 @@ public class CarController {
         return ResponseEntity.ok(carService.createCar(carDTO));
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/update")
     private ResponseEntity<CarDTO> updateCar(@Valid @RequestBody CarDTO carDTO) {
         return ResponseEntity.ok(carService.updateCar(carDTO));
     }
@@ -47,5 +47,10 @@ public class CarController {
     @DeleteMapping("/delete/{id}")
     private ResponseEntity<CarDTO> deleteCar(@PathVariable Integer id) {
         return ResponseEntity.ok(carService.deleteCar(id));
+    }
+
+    @PatchMapping("/patch")
+    private ResponseEntity<CarDTO> pathcCar(@RequestBody CarDTO carDTO) {
+        return ResponseEntity.ok(carService.pathcCar(carDTO));
     }
 }
