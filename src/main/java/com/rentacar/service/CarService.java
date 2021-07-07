@@ -5,12 +5,11 @@ import java.util.*;
 import com.rentacar.model.CarDTO;
 import com.rentacar.model.adapters.CarAdapter;
 import com.rentacar.model.validations.OnCreate;
+import com.rentacar.repository.car.Car;
 import com.rentacar.repository.car.CarRepository;
 import com.rentacar.service.exceptions.*;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-
-import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 @Service
@@ -28,9 +27,11 @@ public class CarService {
     }
 
     public CarDTO getCar(Integer id) {
-        try {
-            return CarAdapter.toDTO(carRepository.getById(id));
-        } catch (EntityNotFoundException exception) {
+        Optional<Car> carFounded = carRepository.findById(id);
+
+        if (carFounded.isPresent()) {
+            return CarAdapter.toDTO(carFounded.get());
+        } else {
             throw new CarNotFoundException("The car with ID " + id + " doesn't exists in database.");
         }
     }
@@ -61,9 +62,9 @@ public class CarService {
 
     private void checkFirstRegistration(CarDTO carDTO) {
         if (carDTO.getFirstRegistration() > Calendar.getInstance().get(Calendar.YEAR)) {
-            throw new CarFirstRegistrationException("Car firstRegistration given is: " + carDTO.getFirstRegistration());
+            throw new CarFirstRegistrationException("Car firstRegistration can not be greater than current year");
         } else if (carDTO.getFirstRegistration() < Calendar.getInstance().get(Calendar.YEAR) - 10) {
-            throw new CarFirstRegistrationException("Car firstRegistration given is: " + carDTO.getFirstRegistration());
+            throw new CarFirstRegistrationException("Car firstRegistration can not be older than 10 years");
         }
     }
 
@@ -82,7 +83,7 @@ public class CarService {
 
     private void checkGearbox(CarDTO carDTO) {
         if (!carDTO.getGearbox().equals("MANUAL") && !carDTO.getGearbox().equals("AUTOMATIC")) {
-            throw new CarGearboxException("Car gearbox is incorrect");
+            throw new CarGearboxException("Car gearbox is incorrect!");
         }
     }
 
