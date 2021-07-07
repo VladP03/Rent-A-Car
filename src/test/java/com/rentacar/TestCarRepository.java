@@ -132,4 +132,15 @@ public class TestCarRepository {
 
         assertTrue(exception.getMessage().contains("The car with ID " + baseCarDTO.getID() + " doesn't exists in database."));
     }
+
+    @Test
+    public void testCarUpdate_Invalid() {
+
+        CarNotFoundException exception = assertThrows(
+                CarNotFoundException.class,
+                () -> carService.updateCar(baseCarDTO)
+        );
+
+        assertTrue(exception.getMessage().contains("The car with ID " + baseCarDTO.getID() + " doesn't exists in database."));
+    }
 }

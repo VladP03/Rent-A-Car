@@ -5,8 +5,8 @@ import java.util.*;
 import com.rentacar.model.CarDTO;
 import com.rentacar.service.CarService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
 
 @RestController
@@ -35,7 +35,12 @@ public class CarController {
     }
 
     @PostMapping("/add")
-    private ResponseEntity<CarDTO> createCar(@Valid @RequestBody CarDTO car) {
-        return ResponseEntity.ok(carService.createCar(car));
+    private ResponseEntity<CarDTO> createCar(@Valid @RequestBody CarDTO carDTO) {
+        return ResponseEntity.ok(carService.createCar(carDTO));
+    }
+
+    @PutMapping("/update/{id}")
+    private ResponseEntity<CarDTO> updateCar(@Valid @RequestBody CarDTO carDTO) {
+        return ResponseEntity.ok(carService.updateCar(carDTO));
     }
 }

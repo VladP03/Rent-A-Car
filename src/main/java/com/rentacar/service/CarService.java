@@ -5,6 +5,7 @@ import java.util.*;
 import com.rentacar.model.CarDTO;
 import com.rentacar.model.adapters.CarAdapter;
 import com.rentacar.model.validations.OnCreate;
+import com.rentacar.model.validations.OnUpdate;
 import com.rentacar.repository.car.Car;
 import com.rentacar.repository.car.CarRepository;
 import com.rentacar.service.exceptions.*;
@@ -52,6 +53,26 @@ public class CarService {
         return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carDTO)));
     }
 
+    @Validated(OnUpdate.class)
+    public CarDTO updateCar(@Valid CarDTO carDTO) {
+        Optional<Car> carFounded = carRepository.findById(carDTO.getID());
+
+        if (carFounded.isPresent()) {
+            namesToUpper(carDTO);
+
+            checkFirstRegistration(carDTO);
+            checkFuel(carDTO);
+            checkGearbox(carDTO);
+
+            carRepository.deleteById(carDTO.getID());
+            carRepository.save(CarAdapter.fromDTO(carDTO));
+
+            return carDTO;
+        } else {
+            throw new CarNotFoundException("The car with ID " + carDTO.getID() + " doesn't exists in database.");
+        }
+    }
+
 
 
     private void checkIfCarAlreadyExists(CarDTO carDTO) {
@@ -82,7 +103,12 @@ public class CarService {
     }
 
     private void checkGearbox(CarDTO carDTO) {
-        if (!carDTO.getGearbox().equals("MANUAL") && !carDTO.getGearbox().equals("AUTOMATIC")) {
+        List<String> gearBoxType = new ArrayList<>();
+
+        gearBoxType.add("MANUAL");
+        gearBoxType.add("AUTOMATIC");
+
+        if (!gearBoxType.contains(carDTO.getGearbox())) {
             throw new CarGearboxException("Car gearbox is incorrect!");
         }
     }
