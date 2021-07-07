@@ -6,7 +6,7 @@ import com.rentacar.model.adapters.CarAdapter;
 import com.rentacar.repository.car.Car;
 import com.rentacar.repository.car.CarRepository;
 import com.rentacar.service.CarService;
-import com.rentacar.service.exceptions.*;
+import com.rentacar.service.exceptions.car.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

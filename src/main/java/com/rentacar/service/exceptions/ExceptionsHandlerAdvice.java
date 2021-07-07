@@ -1,5 +1,6 @@
 package com.rentacar.service.exceptions;
 
+import com.rentacar.service.exceptions.car.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
