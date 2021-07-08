@@ -5,6 +5,7 @@ import com.rentacar.model.CarDTO;
 public class CarFuelException extends RuntimeException{
     private final CarDTO carDTO;
     private String message = "Car fuel is incorrect.";
+    private String debugMessage = "Car fuel might be only: gas, diesel, hybrid and electric";
 
     public CarFuelException(CarDTO carDTO) {
         this.carDTO = carDTO;
@@ -16,5 +17,9 @@ public class CarFuelException extends RuntimeException{
         message += " Error on the following car: " + carDTO.getBrandName() + " " + carDTO.getName() + ", with VIN: " + carDTO.getVIN() + ".";
 
         return message;
+    }
+
+    public String getDebugMessage() {
+        return debugMessage;
     }
 }

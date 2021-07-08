@@ -19,48 +19,48 @@ public class ExceptionsHandlerAdvice extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return new ResponseEntity<>(new ApiError(status, ex.getMessage()), status);
+        return new ResponseEntity<>(new ApiError(status, ex.getMessage(), ""), status);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ApiError onConstraintViolationException(ConstraintViolationException exception) {
-        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage());
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), "");
     }
 
     @ExceptionHandler(CarNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ApiError onCarNotFoundException(CarNotFoundException exception) {
-        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage());
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
     }
 
     @ExceptionHandler(CarAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ApiError onCarAlreadyExistsException(CarAlreadyExistsException exception) {
-        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage());
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
     }
 
     @ExceptionHandler(CarFirstRegistrationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ApiError onCarFirstRegistrationException(CarFirstRegistrationException exception) {
-        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage());
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
     }
 
     @ExceptionHandler(CarFuelException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ApiError onCarFuelException(CarFuelException exception) {
-        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage());
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
     }
 
     @ExceptionHandler(CarGearboxException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ApiError onCarGearboxException(CarGearboxException exception) {
-        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage());
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
     }
 }

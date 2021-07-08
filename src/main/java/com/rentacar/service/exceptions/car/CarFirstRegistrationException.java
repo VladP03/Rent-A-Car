@@ -7,6 +7,9 @@ import java.util.Calendar;
 public class CarFirstRegistrationException extends RuntimeException{
     private final CarDTO carDTO;
     private String message = "Car first registration can not be ";
+    private final Integer maxYear = Calendar.getInstance().get(Calendar.YEAR);
+    private final Integer minYear = maxYear - 10;
+    private final String debugMessage = "Car's first registration must be between " + minYear + " and " + maxYear;
 
     public CarFirstRegistrationException(CarDTO carDTO) {
         this.carDTO = carDTO;
@@ -23,5 +26,9 @@ public class CarFirstRegistrationException extends RuntimeException{
         message += " Error on the following car: " + carDTO.getBrandName() + " " + carDTO.getName() + ", with VIN: " + carDTO.getVIN() + ".";
 
         return message;
+    }
+
+    public String getDebugMessage() {
+        return debugMessage;
     }
 }

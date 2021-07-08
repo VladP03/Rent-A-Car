@@ -12,15 +12,13 @@ public class ApiError implements Serializable {
     private final LocalDateTime timestamp;
     private HttpStatus httpStatus;
     private String message;
+    private String debugMessage;
 
-    public ApiError() {
+    public ApiError(HttpStatus httpStatus, String message, String debugMessage) {
         this.timestamp = LocalDateTime.now();
-    }
-
-    public ApiError(HttpStatus httpStatus, String message) {
-        this();
         this.httpStatus = httpStatus;
         this.message = message;
+        this.debugMessage = debugMessage;
     }
 
     public HttpStatus getHttpStatus() {
@@ -38,6 +36,15 @@ public class ApiError implements Serializable {
 
     public ApiError setMessage(String message) {
         this.message = message;
+        return this;
+    }
+
+    public String getDebugMessage() {
+        return debugMessage;
+    }
+
+    public ApiError setDebugMessage(String debugMessage) {
+        this.debugMessage = debugMessage;
         return this;
     }
 }
