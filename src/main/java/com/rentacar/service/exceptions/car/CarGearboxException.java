@@ -1,7 +1,20 @@
 package com.rentacar.service.exceptions.car;
 
+import com.rentacar.model.CarDTO;
+
 public class CarGearboxException extends RuntimeException{
-    public CarGearboxException(String message) {
-        super(message);
+    private final CarDTO carDTO;
+    private String message = "Car gearbox is incorrect.";
+
+    public CarGearboxException(CarDTO carDTO) {
+        this.carDTO = carDTO;
+    }
+
+    @Override
+    public String getMessage() {
+        message += " Gearbox introduced: " + carDTO.getGearbox() + ".";
+        message += " Error on the following car: " + carDTO.getBrandName() + " " + carDTO.getName() + ", with VIN: " + carDTO.getVIN() + ".";
+
+        return message;
     }
 }

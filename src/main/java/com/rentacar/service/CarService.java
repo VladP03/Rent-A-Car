@@ -33,7 +33,7 @@ public class CarService {
         if (carFounded.isPresent()) {
             return CarAdapter.toDTO(carFounded.get());
         } else {
-            throw new CarNotFoundException("The car with ID " + id + " doesn't exists in database.");
+            throw new CarNotFoundException(id);
         }
     }
 
@@ -50,8 +50,8 @@ public class CarService {
         checkFuel(carDTO);
         checkGearbox(carDTO);
 
-//        return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carDTO)));
-        return carDTO;
+        return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carDTO)));
+//        return carDTO;
     }
 
     @Validated(OnUpdate.class)
@@ -70,7 +70,7 @@ public class CarService {
 
             return carDTO;
         } else {
-            throw new CarNotFoundException("The car with ID " + carDTO.getID() + " doesn't exists in database.");
+            throw new CarNotFoundException(carDTO.getID());
         }
     }
 
@@ -117,7 +117,7 @@ public class CarService {
 
             return finalCar;
         } else {
-            throw new CarNotFoundException("The car with ID " + carDTO.getID() + " doesn't exists in database.");
+            throw new CarNotFoundException(carDTO.getID());
         }
     }
 
@@ -129,7 +129,7 @@ public class CarService {
 
             return CarAdapter.toDTO(carFounded.get());
         } else {
-            throw new CarNotFoundException("The car with ID " + id + " doesn't exists in database.");
+            throw new CarNotFoundException(id);
         }
     }
 
@@ -137,15 +137,15 @@ public class CarService {
 
     private void checkIfCarAlreadyExists(CarDTO carDTO) {
         if (carRepository.findByVIN(carDTO.getVIN()) != null) {
-            throw new CarAlreadyExistsException("Car already exists in db.");
+            throw new CarAlreadyExistsException(carDTO);
         }
     }
 
     private void checkFirstRegistration(CarDTO carDTO) {
         if (carDTO.getFirstRegistration() > Calendar.getInstance().get(Calendar.YEAR)) {
-            throw new CarFirstRegistrationException("Car firstRegistration can not be greater than current year");
+            throw new CarFirstRegistrationException(carDTO);
         } else if (carDTO.getFirstRegistration() < Calendar.getInstance().get(Calendar.YEAR) - 10) {
-            throw new CarFirstRegistrationException("Car firstRegistration can not be older than 10 years");
+            throw new CarFirstRegistrationException(carDTO);
         }
     }
 
@@ -158,7 +158,7 @@ public class CarService {
         fuelType.add("ELECTRIC");
 
         if (!fuelType.contains(carDTO.getFuel().toUpperCase())) {
-            throw new CarFuelException("Car fuel type is incorrect!");
+            throw new CarFuelException(carDTO);
         }
     }
 
@@ -169,7 +169,7 @@ public class CarService {
         gearBoxType.add("AUTOMATIC");
 
         if (!gearBoxType.contains(carDTO.getGearbox().toUpperCase())) {
-            throw new CarGearboxException("Car gearbox is incorrect!");
+            throw new CarGearboxException(carDTO);
         }
     }
 

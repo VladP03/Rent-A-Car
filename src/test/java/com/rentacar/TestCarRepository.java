@@ -7,7 +7,6 @@ import com.rentacar.repository.car.Car;
 import com.rentacar.repository.car.CarRepository;
 import com.rentacar.service.CarService;
 import com.rentacar.service.exceptions.car.*;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -76,7 +75,7 @@ public class TestCarRepository {
                 () -> carService.createCar(baseCarDTO)
         );
 
-        assertTrue(exception.getMessage().contains("Car already exists in db."));
+        assertEquals("Car already exists. Error on the following car: " + baseCarDTO.getBrandName() + " " + baseCarDTO.getName() + ", with VIN: " + baseCarDTO.getVIN() + ".", exception.getMessage());
     }
 
     @Test
@@ -90,7 +89,8 @@ public class TestCarRepository {
                 () -> carService.createCar(baseCarDTO)
         );
 
-        assertTrue(exception.getMessage().contains("Car firstRegistration can not be older than 10 years"));
+        assertEquals("Car first registration can not be older than 10 years, year introduced: " + baseCarDTO.getFirstRegistration() +
+                ". Error on the following car: " + baseCarDTO.getBrandName() + " " + baseCarDTO.getName() + ", with VIN: " + baseCarDTO.getVIN() + ".", exception.getMessage());
     }
 
     @Test
@@ -104,7 +104,8 @@ public class TestCarRepository {
                 () -> carService.createCar(baseCarDTO)
         );
 
-        assertTrue(exception.getMessage().contains("Car firstRegistration can not be greater than current year"));
+        assertEquals("Car first registration can not be greater than current year, year introduced: " + baseCarDTO.getFirstRegistration() +
+                ". Error on the following car: " + baseCarDTO.getBrandName() + " " + baseCarDTO.getName() + ", with VIN: " + baseCarDTO.getVIN() + ".", exception.getMessage());
     }
 
     @Test
@@ -118,7 +119,8 @@ public class TestCarRepository {
                 () -> carService.createCar(baseCarDTO)
         );
 
-        assertTrue(exception.getMessage().contains("Car fuel type is incorrect!"));
+        assertEquals("Car fuel is incorrect. Fuel introduced: " + baseCarDTO.getFuel() + ". Error on the following car: " +
+                baseCarDTO.getBrandName() + " " + baseCarDTO.getName() + ", with VIN: " + baseCarDTO.getVIN() + ".", exception.getMessage());
     }
 
     @Test
@@ -132,7 +134,8 @@ public class TestCarRepository {
                 () -> carService.createCar(baseCarDTO)
         );
 
-        assertTrue(exception.getMessage().contains("Car gearbox is incorrect!"));
+        assertEquals("Car gearbox is incorrect. Gearbox introduced: " + baseCarDTO.getGearbox() + ". Error on the following car: " +
+                baseCarDTO.getBrandName() + " " + baseCarDTO.getName() + ", with VIN: " + baseCarDTO.getVIN() + ".", exception.getMessage());
     }
 
     @Test
@@ -144,7 +147,7 @@ public class TestCarRepository {
                 () -> carService.getCar(baseCarDTO.getID())
         );
 
-        assertTrue(exception.getMessage().contains("The car with ID " + baseCarDTO.getID() + " doesn't exists in database."));
+        assertEquals("Car not found. In database does not exists an car with id " + baseCarDTO.getID() + ".", exception.getMessage());
     }
 
     @Test
@@ -155,7 +158,7 @@ public class TestCarRepository {
                 () -> carService.updateCar(baseCarDTO)
         );
 
-        assertTrue(exception.getMessage().contains("The car with ID " + baseCarDTO.getID() + " doesn't exists in database."));
+        assertEquals("Car not found. In database does not exists an car with id " + baseCarDTO.getID() + ".", exception.getMessage());
     }
 
     @Test
@@ -166,7 +169,7 @@ public class TestCarRepository {
                 () -> carService.deleteCar(Mockito.anyInt())
         );
 
-        assertTrue(exception.getMessage().contains("The car with ID " + 0 + " doesn't exists in database."));
+        assertEquals("Car not found. In database does not exists an car with id " + 0 + ".", exception.getMessage());
     }
 
     @Test
@@ -204,7 +207,7 @@ public class TestCarRepository {
                 () -> carService.pathcCar(baseCarDTO)
         );
 
-        assertTrue(exception.getMessage().contains("The car with ID " + baseCarDTO.getID() + " doesn't exists in database."));
+        assertEquals("Car not found. In database does not exists an car with id " + baseCarDTO.getID() + ".", exception.getMessage());
     }
 
     @Test
@@ -220,7 +223,8 @@ public class TestCarRepository {
                 () -> carService.pathcCar(baseCarDTO)
         );
 
-        assertTrue(exception.getMessage().contains("Car firstRegistration can not be older than 10 years"));
+        assertEquals("Car first registration can not be older than 10 years, year introduced: " + baseCarDTO.getFirstRegistration() +
+                ". Error on the following car: " + baseCarDTO.getBrandName() + " " + baseCarDTO.getName() + ", with VIN: " + baseCarDTO.getVIN() + ".", exception.getMessage());
     }
 
     @Test
@@ -236,7 +240,8 @@ public class TestCarRepository {
                 () -> carService.pathcCar(baseCarDTO)
         );
 
-        assertTrue(exception.getMessage().contains("Car firstRegistration can not be greater than current year"));
+        assertEquals("Car first registration can not be greater than current year, year introduced: " + baseCarDTO.getFirstRegistration() +
+                ". Error on the following car: " + baseCarDTO.getBrandName() + " " + baseCarDTO.getName() + ", with VIN: " + baseCarDTO.getVIN() + ".", exception.getMessage());
     }
 
     @Test
@@ -253,7 +258,8 @@ public class TestCarRepository {
                 () -> carService.pathcCar(baseCarDTO)
         );
 
-        assertTrue(exception.getMessage().contains("Car fuel type is incorrect!"));
+        assertEquals("Car fuel is incorrect. Fuel introduced: " + baseCarDTO.getFuel() + ". Error on the following car: " +
+                baseCarDTO.getBrandName() + " " + baseCarDTO.getName() + ", with VIN: " + baseCarDTO.getVIN() + ".", exception.getMessage());
     }
 
     @Test
@@ -271,6 +277,7 @@ public class TestCarRepository {
                 () -> carService.pathcCar(baseCarDTO)
         );
 
-        assertTrue(exception.getMessage().contains("Car gearbox is incorrect!"));
+        assertEquals("Car gearbox is incorrect. Gearbox introduced: " + baseCarDTO.getGearbox() + ". Error on the following car: " +
+                baseCarDTO.getBrandName() + " " + baseCarDTO.getName() + ", with VIN: " + baseCarDTO.getVIN() + ".", exception.getMessage());
     }
 }
