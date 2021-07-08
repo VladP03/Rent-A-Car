@@ -118,4 +118,63 @@ public class CarDTO {
         this.gearbox = gearbox;
         return this;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (! (obj instanceof CarDTO)) {
+            return false;
+        }
+
+        if (this == obj) {
+            return true;
+        }
+
+        CarDTO carDTO = (CarDTO) obj;
+
+        if (this.getID() == null && carDTO.getID() == null) {
+
+        } else if ((this.getID() != null && carDTO.getID() == null) || (this.getID() == null && carDTO.getID() != null)) {
+            return false;
+        } else if (!this.getID().equals(carDTO.getID())) {
+            return false;
+        }
+
+        if (!this.getBrandName().equals(carDTO.getBrandName())) {
+            return false;
+        }
+
+        if (!this.getName().equals(carDTO.getName())) {
+            return false;
+        }
+
+        if (!this.getVIN().equals(carDTO.getVIN())) {
+            return false;
+        }
+
+        if (!this.getFirstRegistration().equals(carDTO.getFirstRegistration())) {
+            return false;
+        }
+
+        if (!this.getEngineCapacity().equals(carDTO.getEngineCapacity())) {
+            return false;
+        }
+
+        if (!this.getFuel().equals(carDTO.getFuel())) {
+            return false;
+        }
+
+        if (!this.getMileage().equals(carDTO.getMileage())) {
+            return false;
+        }
+
+        if (!this.getGearbox().equals(carDTO.getGearbox())) {
+            return false;
+        }
+
+        return true;
+    }
 }
