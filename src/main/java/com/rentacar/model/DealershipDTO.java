@@ -2,11 +2,9 @@ package com.rentacar.model;
 
 import com.rentacar.model.validations.OnCreate;
 import com.rentacar.model.validations.OnUpdate;
-import com.rentacar.repository.car.Car;
 
 import javax.validation.constraints.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class DealershipDTO {
     @Null(message = "Dealership's ID must be null", groups = {OnCreate.class})
@@ -30,7 +28,7 @@ public class DealershipDTO {
     @NotEmpty(message = "Dealership's phone number may not be null or empty")
     private String phoneNumber;
 
-    private List<Car> cars = new ArrayList<>();
+    private List<CarDTO> cars = new ArrayList<>();
 
     public Integer getID() {
         return ID;
@@ -86,11 +84,11 @@ public class DealershipDTO {
         return this;
     }
 
-    public List<Car> getCars() {
+    public List<CarDTO> getCars() {
         return cars;
     }
 
-    public DealershipDTO setCars(List<Car> cars) {
+    public DealershipDTO setCars(List<CarDTO> cars) {
         this.cars = cars;
         return this;
     }

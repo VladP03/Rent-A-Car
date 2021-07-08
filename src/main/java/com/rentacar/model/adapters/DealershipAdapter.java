@@ -16,7 +16,7 @@ public class DealershipAdapter {
                 .setCountry(dealership.getCountry())
                 .setEmail(dealership.getEmail())
                 .setPhoneNumber(dealership.getPhoneNumber())
-                .setCars(dealership.getCars());
+                .setCars(CarAdapter.toListDTO(dealership.getCars()));
     }
 
     public static Dealership fromDTO (DealershipDTO dealershipDTO) {
@@ -27,7 +27,7 @@ public class DealershipAdapter {
                 .setCountry(dealershipDTO.getCountry())
                 .setEmail(dealershipDTO.getEmail())
                 .setPhoneNumber(dealershipDTO.getPhoneNumber())
-                .setCars(dealershipDTO.getCars());
+                .setCars(CarAdapter.fromListDTO(dealershipDTO.getCars()));
     }
 
     public static List<DealershipDTO> toListDTO (List<Dealership> dealershipList) {

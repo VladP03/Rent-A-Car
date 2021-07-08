@@ -50,7 +50,8 @@ public class CarService {
         checkFuel(carDTO);
         checkGearbox(carDTO);
 
-        return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carDTO)));
+//        return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carDTO)));
+        return carDTO;
     }
 
     @Validated(OnUpdate.class)

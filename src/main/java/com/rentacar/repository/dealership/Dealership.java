@@ -18,7 +18,8 @@ public class Dealership {
     private String email;
     private String phoneNumber;
 
-    @OneToMany(mappedBy = "Car")
+    @OneToMany(orphanRemoval=true, cascade = CascadeType.ALL)
+    @JoinColumn(name="DEALER_ID") // join column is in table for Order
     private List<Car> cars = new ArrayList<>();
 
     public Dealership() {
