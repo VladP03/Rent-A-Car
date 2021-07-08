@@ -1,12 +1,13 @@
 package com.rentacar;
 
-
+import java.util.*;
 import com.rentacar.model.CarDTO;
 import com.rentacar.model.adapters.CarAdapter;
 import com.rentacar.repository.car.Car;
 import com.rentacar.repository.car.CarRepository;
 import com.rentacar.service.CarService;
 import com.rentacar.service.exceptions.car.*;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,14 +16,18 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class TestCarRepository {
 
     private CarDTO baseCarDTO;
     private Car baseCar;
+
+    @Mock
+    private CarRepository carRepositoryMock;
+    @InjectMocks
+    private CarService carService;
 
     @BeforeEach
     public void init() {
@@ -37,20 +42,29 @@ public class TestCarRepository {
                 .setMileage(0d)
                 .setGearbox("manual");
 
+        namesToUpper(baseCarDTO);
+
         baseCar = CarAdapter.fromDTO(baseCarDTO);
     }
 
-    @Mock
-    private CarRepository carRepositoryMock;
-    @InjectMocks
-    private CarService carService;
+    private void namesToUpper(CarDTO carDTO) {
+        carDTO.setBrandName(carDTO.getBrandName().toUpperCase());
+        carDTO.setName(carDTO.getName().toUpperCase());
+        carDTO.setVIN(carDTO.getVIN().toUpperCase());
+        carDTO.setFuel(carDTO.getFuel().toUpperCase());
+        carDTO.setGearbox(carDTO.getGearbox().toUpperCase());
+    }
+
+
 
     @Test
     public void testCarAdd_ValidParameters() {
         Mockito.when(carRepositoryMock.findByVIN(Mockito.anyString())).thenReturn(null);
         Mockito.when(carRepositoryMock.save(Mockito.any(Car.class))).thenReturn(baseCar);
 
-        carService.createCar(baseCarDTO);
+        CarDTO carAdded = carService.createCar(baseCarDTO);
+
+        assertEquals(baseCarDTO, carAdded);
     }
 
     @Test
