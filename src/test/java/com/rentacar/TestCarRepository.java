@@ -157,4 +157,120 @@ public class TestCarRepository {
 
         assertTrue(exception.getMessage().contains("The car with ID " + baseCarDTO.getID() + " doesn't exists in database."));
     }
+
+    @Test
+    public void testCarDelete_CarDoesNotExistsInDB() {
+
+        CarNotFoundException exception = assertThrows(
+                CarNotFoundException.class,
+                () -> carService.deleteCar(Mockito.anyInt())
+        );
+
+        assertTrue(exception.getMessage().contains("The car with ID " + 0 + " doesn't exists in database."));
+    }
+
+    @Test
+    public void testCarDelete_ValidTest() {
+        baseCarDTO.setID(1);
+        baseCar = CarAdapter.fromDTO(baseCarDTO);
+
+        Mockito.when(carRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.ofNullable(baseCar));
+
+        CarDTO carDTODeleted = carService.deleteCar(baseCarDTO.getID());
+
+        assertEquals(carDTODeleted, baseCarDTO);
+    }
+
+    @Test
+    public void testCarPatch_ValidTest() {
+        baseCarDTO.setID(1);
+        baseCar = CarAdapter.fromDTO(baseCarDTO);
+
+        Mockito.when(carRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.ofNullable(baseCar));
+
+        baseCar.setName("NewCar");
+        baseCar.setBrandName("NewCar");
+
+        CarDTO patchedCarDTO = carService.pathcCar(baseCarDTO);
+
+        assertEquals(patchedCarDTO, baseCarDTO);
+    }
+
+    @Test
+    public void TestCarPatch_CarNotFound() {
+
+        CarNotFoundException exception = assertThrows(
+                CarNotFoundException.class,
+                () -> carService.pathcCar(baseCarDTO)
+        );
+
+        assertTrue(exception.getMessage().contains("The car with ID " + baseCarDTO.getID() + " doesn't exists in database."));
+    }
+
+    @Test
+    public void TestCarPatch_FirstRegistrationException_Older() {
+        baseCarDTO.setID(1);
+        baseCarDTO.setFirstRegistration(1);
+        baseCar = CarAdapter.fromDTO(baseCarDTO);
+
+        Mockito.when(carRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.ofNullable(baseCar));
+
+        CarFirstRegistrationException exception = assertThrows(
+                CarFirstRegistrationException.class,
+                () -> carService.pathcCar(baseCarDTO)
+        );
+
+        assertTrue(exception.getMessage().contains("Car firstRegistration can not be older than 10 years"));
+    }
+
+    @Test
+    public void TestCarPatch_FirstRegistrationException_Greater() {
+        baseCarDTO.setID(1);
+        baseCarDTO.setFirstRegistration(9999);
+        baseCar = CarAdapter.fromDTO(baseCarDTO);
+
+        Mockito.when(carRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.ofNullable(baseCar));
+
+        CarFirstRegistrationException exception = assertThrows(
+                CarFirstRegistrationException.class,
+                () -> carService.pathcCar(baseCarDTO)
+        );
+
+        assertTrue(exception.getMessage().contains("Car firstRegistration can not be greater than current year"));
+    }
+
+    @Test
+    public void TestCarPatch_FuelException() {
+        baseCarDTO.setID(1);
+        baseCarDTO.setFirstRegistration(2020);
+        baseCarDTO.setFuel("TEST");
+        baseCar = CarAdapter.fromDTO(baseCarDTO);
+
+        Mockito.when(carRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.ofNullable(baseCar));
+
+        CarFuelException exception = assertThrows(
+                CarFuelException.class,
+                () -> carService.pathcCar(baseCarDTO)
+        );
+
+        assertTrue(exception.getMessage().contains("Car fuel type is incorrect!"));
+    }
+
+    @Test
+    public void TestCarPatch_GearboxException() {
+        baseCarDTO.setID(1);
+        baseCarDTO.setFirstRegistration(2020);
+        baseCarDTO.setFuel("GAS");
+        baseCarDTO.setGearbox("TEST");
+        baseCar = CarAdapter.fromDTO(baseCarDTO);
+
+        Mockito.when(carRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.ofNullable(baseCar));
+
+        CarGearboxException exception = assertThrows(
+                CarGearboxException.class,
+                () -> carService.pathcCar(baseCarDTO)
+        );
+
+        assertTrue(exception.getMessage().contains("Car gearbox is incorrect!"));
+    }
 }
