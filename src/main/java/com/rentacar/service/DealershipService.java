@@ -9,6 +9,8 @@ import com.rentacar.model.adapters.DealershipAdapter;
 import com.rentacar.model.validations.OnCreate;
 import com.rentacar.repository.dealership.Dealership;
 import com.rentacar.repository.dealership.DealershipRepository;
+import com.rentacar.service.exceptions.dealership.DealershipAlreadyExistsException;
+import com.rentacar.service.exceptions.dealership.DealershipNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -42,7 +44,7 @@ public class DealershipService {
 
             return DealershipAdapter.toDTO(dealershipRepository.save(DealershipAdapter.fromDTO(dealershipDTO)));
         } else {
-            throw new RuntimeException("Dealership founded");
+            throw new DealershipAlreadyExistsException(DealershipAdapter.toDTO(dealershipFounded.get()));
         }
     }
 
@@ -61,7 +63,7 @@ public class DealershipService {
             return DealershipAdapter.toDTO(dealershipRepository.save(dealershipFounded.get()));
 
         } else {
-            throw new RuntimeException("Dealership not founded");
+            throw new DealershipNotFoundException(id);
         }
     }
 }
