@@ -36,7 +36,7 @@ public class CarController {
 
     @PostMapping("/add")
     private ResponseEntity<CarDTO> createCar(@Valid @RequestBody CarDTO carDTO) {
-        return ResponseEntity.ok(carService.createCar(carDTO));
+        return ResponseEntity.ok(carService.createCarAdmin(carDTO));
     }
 
     @PutMapping("/update")

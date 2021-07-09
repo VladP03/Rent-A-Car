@@ -4,9 +4,9 @@ import java.util.*;
 
 import com.rentacar.model.CarDTO;
 import com.rentacar.model.DealershipDTO;
+import com.rentacar.model.adapters.CarAdapter;
 import com.rentacar.model.adapters.DealershipAdapter;
 import com.rentacar.model.validations.OnCreate;
-import com.rentacar.repository.car.Car;
 import com.rentacar.repository.dealership.Dealership;
 import com.rentacar.repository.dealership.DealershipRepository;
 import org.springframework.stereotype.Service;
@@ -43,6 +43,25 @@ public class DealershipService {
             return DealershipAdapter.toDTO(dealershipRepository.save(DealershipAdapter.fromDTO(dealershipDTO)));
         } else {
             throw new RuntimeException("Dealership founded");
+        }
+    }
+
+    public DealershipDTO addACarsToDealership(Integer id, List<CarDTO> carDTOList) {
+
+        Optional<Dealership> dealershipFounded = dealershipRepository.findById(id);
+
+        if (dealershipFounded.isPresent()) {
+
+            for (CarDTO carDTO: carDTOList) {
+                carService.createCar(carDTO);
+            }
+
+            dealershipFounded.get().getCars().addAll(CarAdapter.fromListDTO(carDTOList));
+
+            return DealershipAdapter.toDTO(dealershipRepository.save(dealershipFounded.get()));
+
+        } else {
+            throw new RuntimeException("Dealership not founded");
         }
     }
 }

@@ -42,7 +42,7 @@ public class CarService {
     }
 
     @Validated(OnCreate.class)
-    public CarDTO createCar(@Valid CarDTO carDTO) {
+    public CarDTO createCarAdmin(@Valid CarDTO carDTO) {
         namesToUpper(carDTO);
 
         checkIfCarAlreadyExists(carDTO);
@@ -51,7 +51,17 @@ public class CarService {
         checkGearbox(carDTO);
 
         return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carDTO)));
-//        return carDTO;
+    }
+
+    @Validated(OnCreate.class)
+    public void createCar(@Valid CarDTO carDTO) {
+        namesToUpper(carDTO);
+
+        checkIfCarAlreadyExists(carDTO);
+        checkFirstRegistration(carDTO);
+        checkFuel(carDTO);
+        checkGearbox(carDTO);
+
     }
 
     @Validated(OnUpdate.class)
@@ -65,7 +75,6 @@ public class CarService {
             checkFuel(carDTO);
             checkGearbox(carDTO);
 
-            carRepository.deleteById(carDTO.getID());
             carRepository.save(CarAdapter.fromDTO(carDTO));
 
             return carDTO;

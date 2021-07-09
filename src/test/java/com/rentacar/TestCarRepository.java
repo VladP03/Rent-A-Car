@@ -61,7 +61,7 @@ public class TestCarRepository {
         Mockito.when(carRepositoryMock.findByVIN(Mockito.anyString())).thenReturn(null);
         Mockito.when(carRepositoryMock.save(Mockito.any(Car.class))).thenReturn(baseCar);
 
-        CarDTO carAdded = carService.createCar(baseCarDTO);
+        CarDTO carAdded = carService.createCarAdmin(baseCarDTO);
 
         assertEquals(baseCarDTO, carAdded);
     }
@@ -72,7 +72,7 @@ public class TestCarRepository {
 
         CarAlreadyExistsException exception = assertThrows(
                 CarAlreadyExistsException.class,
-                () -> carService.createCar(baseCarDTO)
+                () -> carService.createCarAdmin(baseCarDTO)
         );
 
         assertEquals("Car already exists. Error on the following car: " + baseCarDTO.getBrandName() + " " + baseCarDTO.getName() + ", with VIN: " + baseCarDTO.getVIN() + ".", exception.getMessage());
@@ -86,7 +86,7 @@ public class TestCarRepository {
 
         CarFirstRegistrationException exception = assertThrows(
                 CarFirstRegistrationException.class,
-                () -> carService.createCar(baseCarDTO)
+                () -> carService.createCarAdmin(baseCarDTO)
         );
 
         assertEquals("Car first registration can not be older than 10 years, year introduced: " + baseCarDTO.getFirstRegistration() +
@@ -101,7 +101,7 @@ public class TestCarRepository {
 
         CarFirstRegistrationException exception = assertThrows(
                 CarFirstRegistrationException.class,
-                () -> carService.createCar(baseCarDTO)
+                () -> carService.createCarAdmin(baseCarDTO)
         );
 
         assertEquals("Car first registration can not be greater than current year, year introduced: " + baseCarDTO.getFirstRegistration() +
@@ -116,7 +116,7 @@ public class TestCarRepository {
 
         CarFuelException exception = assertThrows(
                 CarFuelException.class,
-                () -> carService.createCar(baseCarDTO)
+                () -> carService.createCarAdmin(baseCarDTO)
         );
 
         assertEquals("Car fuel is incorrect. Fuel introduced: " + baseCarDTO.getFuel() + ". Error on the following car: " +
@@ -131,7 +131,7 @@ public class TestCarRepository {
 
         CarGearboxException exception = assertThrows(
                 CarGearboxException.class,
-                () -> carService.createCar(baseCarDTO)
+                () -> carService.createCarAdmin(baseCarDTO)
         );
 
         assertEquals("Car gearbox is incorrect. Gearbox introduced: " + baseCarDTO.getGearbox() + ". Error on the following car: " +

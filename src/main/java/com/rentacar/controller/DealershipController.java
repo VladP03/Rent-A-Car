@@ -1,5 +1,6 @@
 package com.rentacar.controller;
 
+import com.rentacar.model.CarDTO;
 import com.rentacar.model.DealershipDTO;
 import com.rentacar.service.DealershipService;
 import org.springframework.http.ResponseEntity;
@@ -26,5 +27,10 @@ public class DealershipController {
     @PostMapping("/add")
     private ResponseEntity<DealershipDTO> createDealership(@Valid @RequestBody DealershipDTO dealershipDTO) {
         return ResponseEntity.ok(dealershipService.createDealership(dealershipDTO));
+    }
+
+    @PostMapping("/add/cars/{id}")
+    private ResponseEntity<DealershipDTO> addCarToDealership(@PathVariable Integer id, @Valid @RequestBody List<CarDTO> carDTOList) {
+        return ResponseEntity.ok(dealershipService.addACarsToDealership(id, carDTOList));
     }
 }
