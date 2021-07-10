@@ -9,15 +9,18 @@ import java.util.List;
 public class CityAdapter {
 
     public static CityDTO toDTO(City city) {
-        return new CityDTO()
-                .setId(city.getId())
-                .setName(city.getName());
+        return CityDTO.builder()
+                .id(city.getId())
+                .name(city.getName())
+                .build();
+
     }
 
     public static City fromDTO (CityDTO cityDTO) {
-        return new City()
-                .setId(cityDTO.getId())
-                .setName(cityDTO.getName());
+        return City.builder()
+                .id(cityDTO.getId())
+                .name(cityDTO.getName())
+                .build();
     }
 
     public static List<CityDTO> toListDTO (List<City> cityList) {

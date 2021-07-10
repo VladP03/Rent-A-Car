@@ -8,29 +8,31 @@ import com.rentacar.repository.car.Car;
 public class CarAdapter {
 
     public static CarDTO toDTO(Car car) {
-        return new CarDTO()
-                .setID(car.getID())
-                .setBrandName(car.getBrandName())
-                .setName(car.getName())
-                .setVIN(car.getVIN())
-                .setFirstRegistration(car.getFirstRegistration())
-                .setEngineCapacity(car.getEngineCapacity())
-                .setFuel(car.getFuel())
-                .setMileage(car.getMileage())
-                .setGearbox(car.getGearbox());
+        return CarDTO.builder()
+                .ID(car.getID())
+                .brandName(car.getBrandName())
+                .name(car.getName())
+                .VIN(car.getVIN())
+                .firstRegistration(car.getFirstRegistration())
+                .engineCapacity(car.getEngineCapacity())
+                .fuel(car.getFuel())
+                .mileage(car.getMileage())
+                .gearbox(car.getGearbox())
+                .build();
     }
 
     public static Car fromDTO (CarDTO carDTO) {
-        return new Car()
-                .setID(carDTO.getID())
-                .setBrandName(carDTO.getBrandName())
-                .setName(carDTO.getName())
-                .setVIN(carDTO.getVIN())
-                .setFirstRegistration(carDTO.getFirstRegistration())
-                .setEngineCapacity(carDTO.getEngineCapacity())
-                .setFuel(carDTO.getFuel())
-                .setMileage(carDTO.getMileage())
-                .setGearbox(carDTO.getGearbox());
+        return Car.builder()
+                .ID(carDTO.getID())
+                .brandName(carDTO.getBrandName())
+                .name(carDTO.getName())
+                .VIN(carDTO.getVIN())
+                .firstRegistration(carDTO.getFirstRegistration())
+                .engineCapacity(carDTO.getEngineCapacity())
+                .fuel(carDTO.getFuel())
+                .mileage(carDTO.getMileage())
+                .gearbox(carDTO.getGearbox())
+                .build();
     }
 
     public static List<CarDTO> toListDTO (List<Car> carList) {

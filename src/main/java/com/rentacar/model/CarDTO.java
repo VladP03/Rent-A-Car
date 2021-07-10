@@ -2,9 +2,14 @@ package com.rentacar.model;
 
 import com.rentacar.model.validations.OnCreate;
 import com.rentacar.model.validations.OnUpdate;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.*;
 
+@Builder
+@Getter @Setter
 public class CarDTO {
     @Null(message = "Car's ID must be null", groups = {OnCreate.class})
     @NotNull(message = "Car's ID must be not null", groups = {OnUpdate.class})
@@ -39,85 +44,6 @@ public class CarDTO {
     @NotEmpty(message = "Car's gearbox may not be null or empty")
     private String gearbox;
 
-    public Integer getID() {
-        return ID;
-    }
-
-    public CarDTO setID(Integer ID) {
-        this.ID = ID;
-        return this;
-    }
-
-    public String getBrandName() {
-        return brandName;
-    }
-
-    public CarDTO setBrandName(String brandName) {
-        this.brandName = brandName;
-        return this;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public CarDTO setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public String getVIN() {
-        return VIN;
-    }
-
-    public CarDTO setVIN(String VIN) {
-        this.VIN = VIN;
-        return this;
-    }
-
-    public Integer getFirstRegistration() {
-        return firstRegistration;
-    }
-
-    public CarDTO setFirstRegistration(Integer firstRegistration) {
-        this.firstRegistration = firstRegistration;
-        return this;
-    }
-    public Integer getEngineCapacity() {
-        return engineCapacity;
-    }
-
-    public CarDTO setEngineCapacity(Integer engineCapacity) {
-        this.engineCapacity = engineCapacity;
-        return this;
-    }
-
-    public String getFuel() {
-        return fuel;
-    }
-
-    public CarDTO setFuel(String fuel) {
-        this.fuel = fuel;
-        return this;
-    }
-
-    public Double getMileage() {
-        return mileage;
-    }
-
-    public CarDTO setMileage(Double mileage) {
-        this.mileage = mileage;
-        return this;
-    }
-
-    public String getGearbox() {
-        return gearbox;
-    }
-
-    public CarDTO setGearbox(String gearbox) {
-        this.gearbox = gearbox;
-        return this;
-    }
 
     @Override
     public boolean equals(Object obj) {
