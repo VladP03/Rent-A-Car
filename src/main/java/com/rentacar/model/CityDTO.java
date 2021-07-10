@@ -35,4 +35,35 @@ public class CityDTO {
         this.name = name;
         return this;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (! (obj instanceof CityDTO)) {
+            return false;
+        }
+
+        if (this == obj) {
+            return true;
+        }
+
+        CityDTO cityDTO = (CityDTO) obj;
+
+        if (this.getId() == null && cityDTO.getId() == null) {
+
+        } else if ((this.getId() != null && cityDTO.getId() == null) || (this.getId() == null && cityDTO.getId() != null)) {
+            return false;
+        } else if (!this.getId().equals(cityDTO.getId())) {
+            return false;
+        }
+
+        if (!this.getName().equals(cityDTO.getName())) {
+            return false;
+        }
+
+        return true;
+    }
 }
