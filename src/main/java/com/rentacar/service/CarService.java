@@ -38,7 +38,9 @@ public class CarService {
     }
 
     public List<CarDTO> getCarsWithBrandName(String brandName) {
-        return CarAdapter.toListDTO(carRepository.findAllByBrandName(brandName.toUpperCase()));
+        Optional<List<Car>> carDTOList = carRepository.findAllByBrandName(brandName.toUpperCase());
+
+        return carDTOList.map(CarAdapter::toListDTO).orElse(null);
     }
 
     @Validated(OnCreate.class)
@@ -145,7 +147,7 @@ public class CarService {
 
 
     private void checkIfCarAlreadyExists(CarDTO carDTO) {
-        if (carRepository.findByVIN(carDTO.getVIN()) != null) {
+        if (carRepository.findByVIN(carDTO.getVIN()).isPresent()) {
             throw new CarAlreadyExistsException(carDTO);
         }
     }

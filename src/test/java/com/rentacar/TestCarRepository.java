@@ -29,7 +29,7 @@ public class TestCarRepository {
     private CarService carService;
 
     @BeforeEach
-    public void init() {
+    void init() {
         baseCarDTO = new CarDTO()
                 .setID(null)
                 .setBrandName("Test")
@@ -57,8 +57,8 @@ public class TestCarRepository {
 
 
     @Test
-    public void testCarAdd_ValidParameters() {
-        Mockito.when(carRepositoryMock.findByVIN(Mockito.anyString())).thenReturn(null);
+    void testCarAdd_ValidParameters() {
+        Mockito.when(carRepositoryMock.findByVIN(Mockito.anyString())).thenReturn(Optional.empty());
         Mockito.when(carRepositoryMock.save(Mockito.any(Car.class))).thenReturn(baseCar);
 
         CarDTO carAdded = carService.createCarAdmin(baseCarDTO);
@@ -67,8 +67,8 @@ public class TestCarRepository {
     }
 
     @Test
-    public void testCarAdd_AlreadyExistsException() {
-        Mockito.when(carRepositoryMock.findByVIN(Mockito.anyString())).thenReturn(baseCar);
+    void testCarAdd_AlreadyExistsException() {
+        Mockito.when(carRepositoryMock.findByVIN(Mockito.anyString())).thenReturn(Optional.ofNullable(baseCar));
 
         CarAlreadyExistsException exception = assertThrows(
                 CarAlreadyExistsException.class,
@@ -79,8 +79,8 @@ public class TestCarRepository {
     }
 
     @Test
-    public void testCarAdd_FirstRegistrationException_CarTooOld() {
-        Mockito.when(carRepositoryMock.findByVIN(Mockito.anyString())).thenReturn(null);
+    void testCarAdd_FirstRegistrationException_Older() {
+        Mockito.when(carRepositoryMock.findByVIN(Mockito.anyString())).thenReturn(Optional.empty());
 
         baseCarDTO.setFirstRegistration(1999);
 
@@ -94,8 +94,8 @@ public class TestCarRepository {
     }
 
     @Test
-    public void testCarAdd_FirstRegistrationException_CarRegGreatherThenCurrentYear() {
-        Mockito.when(carRepositoryMock.findByVIN(Mockito.anyString())).thenReturn(null);
+    void testCarAdd_FirstRegistrationException_Greater() {
+        Mockito.when(carRepositoryMock.findByVIN(Mockito.anyString())).thenReturn(Optional.empty());
 
         baseCarDTO.setFirstRegistration(9999);
 
@@ -109,8 +109,8 @@ public class TestCarRepository {
     }
 
     @Test
-    public void testCarAdd_CarFuelException_InvalidParameter() {
-        Mockito.when(carRepositoryMock.findByVIN(Mockito.anyString())).thenReturn(null);
+    void testCarAdd_CarFuelException_InvalidParameter() {
+        Mockito.when(carRepositoryMock.findByVIN(Mockito.anyString())).thenReturn(Optional.empty());
 
         baseCarDTO.setFuel("Test");
 
@@ -124,8 +124,8 @@ public class TestCarRepository {
     }
 
     @Test
-    public void testCarAdd_CarGearboxException_InvalidParameter() {
-        Mockito.when(carRepositoryMock.findByVIN(Mockito.anyString())).thenReturn(null);
+    void testCarAdd_CarGearboxException_InvalidParameter() {
+        Mockito.when(carRepositoryMock.findByVIN(Mockito.anyString())).thenReturn(Optional.empty());
 
         baseCarDTO.setGearbox("Test");
 
@@ -139,7 +139,7 @@ public class TestCarRepository {
     }
 
     @Test
-    public void testCarGet_CarNotFoundException_IdNotInDB() {
+    void testCarGet_CarNotFoundException_IdNotInDB() {
         baseCarDTO.setID(1);
 
         CarNotFoundException exception = assertThrows(
@@ -151,7 +151,7 @@ public class TestCarRepository {
     }
 
     @Test
-    public void testCarUpdate_Invalid() {
+    void testCarUpdate_IdNotInDB() {
 
         CarNotFoundException exception = assertThrows(
                 CarNotFoundException.class,
@@ -162,7 +162,79 @@ public class TestCarRepository {
     }
 
     @Test
-    public void testCarDelete_CarDoesNotExistsInDB() {
+    void testCarUpdate_FirstRegistrationException_Older() {
+        baseCarDTO.setID(1);
+        baseCar.setID(1);
+
+        Mockito.when(carRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.ofNullable(baseCar));
+
+        baseCarDTO.setFirstRegistration(1999);
+
+        CarFirstRegistrationException exception = assertThrows(
+                CarFirstRegistrationException.class,
+                () -> carService.updateCar(baseCarDTO)
+        );
+
+        assertEquals("Car first registration can not be older than 10 years, year introduced: " + baseCarDTO.getFirstRegistration() +
+                ". Error on the following car: " + baseCarDTO.getBrandName() + " " + baseCarDTO.getName() + ", with VIN: " + baseCarDTO.getVIN() + ".", exception.getMessage());
+    }
+
+    @Test
+    void testCarUpdate_FirstRegistrationException_Greater() {
+        baseCarDTO.setID(1);
+        baseCar.setID(1);
+
+        Mockito.when(carRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.ofNullable(baseCar));
+
+        baseCarDTO.setFirstRegistration(9999);
+
+        CarFirstRegistrationException exception = assertThrows(
+                CarFirstRegistrationException.class,
+                () -> carService.updateCar(baseCarDTO)
+        );
+
+        assertEquals("Car first registration can not be greater than current year, year introduced: " + baseCarDTO.getFirstRegistration() +
+                ". Error on the following car: " + baseCarDTO.getBrandName() + " " + baseCarDTO.getName() + ", with VIN: " + baseCarDTO.getVIN() + ".", exception.getMessage());
+    }
+
+    @Test
+    void testCarUpdate_FuelException () {
+        baseCarDTO.setID(1);
+        baseCar.setID(1);
+
+        Mockito.when(carRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.ofNullable(baseCar));
+
+        baseCarDTO.setFuel("Test");
+
+        CarFuelException exception = assertThrows(
+                CarFuelException.class,
+                () -> carService.updateCar(baseCarDTO)
+        );
+
+        assertEquals("Car fuel is incorrect. Fuel introduced: " + baseCarDTO.getFuel() + ". Error on the following car: " +
+                baseCarDTO.getBrandName() + " " + baseCarDTO.getName() + ", with VIN: " + baseCarDTO.getVIN() + ".", exception.getMessage());
+    }
+
+    @Test
+    void testCarUpdate_GearboxException () {
+        baseCarDTO.setID(1);
+        baseCar.setID(1);
+
+        Mockito.when(carRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.ofNullable(baseCar));
+
+        baseCarDTO.setGearbox("Test");
+
+        CarGearboxException exception = assertThrows(
+                CarGearboxException.class,
+                () -> carService.updateCar(baseCarDTO)
+        );
+
+        assertEquals("Car gearbox is incorrect. Gearbox introduced: " + baseCarDTO.getGearbox() + ". Error on the following car: " +
+                baseCarDTO.getBrandName() + " " + baseCarDTO.getName() + ", with VIN: " + baseCarDTO.getVIN() + ".", exception.getMessage());
+    }
+
+    @Test
+    void testCarDelete_CarDoesNotExistsInDB() {
 
         CarNotFoundException exception = assertThrows(
                 CarNotFoundException.class,
@@ -173,7 +245,7 @@ public class TestCarRepository {
     }
 
     @Test
-    public void testCarDelete_ValidTest() {
+    void testCarDelete_ValidTest() {
         baseCarDTO.setID(1);
         baseCar = CarAdapter.fromDTO(baseCarDTO);
 
@@ -185,7 +257,7 @@ public class TestCarRepository {
     }
 
     @Test
-    public void testCarPatch_ValidTest() {
+    void testCarPatch_ValidTest() {
         baseCarDTO.setID(1);
         baseCar = CarAdapter.fromDTO(baseCarDTO);
 
@@ -200,7 +272,7 @@ public class TestCarRepository {
     }
 
     @Test
-    public void TestCarPatch_CarNotFound() {
+    void TestCarPatch_CarNotFound() {
 
         CarNotFoundException exception = assertThrows(
                 CarNotFoundException.class,
@@ -211,7 +283,7 @@ public class TestCarRepository {
     }
 
     @Test
-    public void TestCarPatch_FirstRegistrationException_Older() {
+    void TestCarPatch_FirstRegistrationException_Older() {
         baseCarDTO.setID(1);
         baseCarDTO.setFirstRegistration(1);
         baseCar = CarAdapter.fromDTO(baseCarDTO);
@@ -228,7 +300,7 @@ public class TestCarRepository {
     }
 
     @Test
-    public void TestCarPatch_FirstRegistrationException_Greater() {
+    void TestCarPatch_FirstRegistrationException_Greater() {
         baseCarDTO.setID(1);
         baseCarDTO.setFirstRegistration(9999);
         baseCar = CarAdapter.fromDTO(baseCarDTO);
@@ -245,7 +317,7 @@ public class TestCarRepository {
     }
 
     @Test
-    public void TestCarPatch_FuelException() {
+    void TestCarPatch_FuelException() {
         baseCarDTO.setID(1);
         baseCarDTO.setFirstRegistration(2020);
         baseCarDTO.setFuel("TEST");
@@ -263,7 +335,7 @@ public class TestCarRepository {
     }
 
     @Test
-    public void TestCarPatch_GearboxException() {
+    void TestCarPatch_GearboxException() {
         baseCarDTO.setID(1);
         baseCarDTO.setFirstRegistration(2020);
         baseCarDTO.setFuel("GAS");
