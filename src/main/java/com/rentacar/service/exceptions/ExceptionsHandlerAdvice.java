@@ -1,6 +1,8 @@
 package com.rentacar.service.exceptions;
 
 import com.rentacar.service.exceptions.car.*;
+import com.rentacar.service.exceptions.city.CityAlreadyExistsException;
+import com.rentacar.service.exceptions.city.CityNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,20 @@ public class ExceptionsHandlerAdvice extends ResponseEntityExceptionHandler {
     @ResponseBody
     public ApiError onConstraintViolationException(ConstraintViolationException exception) {
         return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), "");
+    }
+
+    @ExceptionHandler(CityAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ApiError onCityAlreadyExistsException(CityAlreadyExistsException exception) {
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
+    }
+
+    @ExceptionHandler(CityNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ApiError onCityNotFoundException(CityNotFoundException exception) {
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
     }
 
     @ExceptionHandler(CarNotFoundException.class)
