@@ -5,7 +5,6 @@ import java.util.*;
 import com.rentacar.model.CarDTO;
 import com.rentacar.service.CarService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
@@ -29,27 +28,27 @@ public class CarController {
         return ResponseEntity.ok(carService.getCar(id));
     }
 
-    @GetMapping("/brand/{brandName}")
+    @GetMapping("/{brandName}")
     private ResponseEntity<List<CarDTO>> getCarsWithBrandName(@PathVariable String brandName) {
         return ResponseEntity.ok(carService.getCarsWithBrandName(brandName));
     }
 
-    @PostMapping("/add")
+    @PostMapping
     private ResponseEntity<CarDTO> createCar(@Valid @RequestBody CarDTO carDTO) {
         return ResponseEntity.ok(carService.createCarAdmin(carDTO));
     }
 
-    @PutMapping("/update")
+    @PutMapping
     private ResponseEntity<CarDTO> updateCar(@Valid @RequestBody CarDTO carDTO) {
         return ResponseEntity.ok(carService.updateCar(carDTO));
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     private ResponseEntity<CarDTO> deleteCar(@PathVariable Integer id) {
         return ResponseEntity.ok(carService.deleteCar(id));
     }
 
-    @PatchMapping("/patch")
+    @PatchMapping
     private ResponseEntity<CarDTO> pathcCar(@RequestBody CarDTO carDTO) {
         return ResponseEntity.ok(carService.pathcCar(carDTO));
     }
