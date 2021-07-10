@@ -31,7 +31,7 @@ public class CityService {
     public CityDTO createCity(CityDTO cityDTO) {
         nameToUpper(cityDTO);
 
-        Optional<City> cityFounded = Optional.ofNullable((cityRepository.findByName(cityDTO.getName())));
+        Optional<City> cityFounded = cityRepository.findByName(cityDTO.getName());
 
         if (!cityFounded.isPresent()) {
 
@@ -46,7 +46,7 @@ public class CityService {
         nameToUpper(cityDTO);
 
         Optional<City> cityFoundedById = cityRepository.findById(cityDTO.getId());
-        Optional<City> cityFoundedByName = Optional.ofNullable(cityRepository.findByName(cityDTO.getName()));
+        Optional<City> cityFoundedByName = cityRepository.findByName(cityDTO.getName());
 
         if (cityFoundedById.isPresent() && !cityFoundedByName.isPresent()) {
             nameToUpper(cityDTO);
