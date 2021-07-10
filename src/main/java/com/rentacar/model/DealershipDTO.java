@@ -21,11 +21,12 @@ public class DealershipDTO {
     @NotEmpty(message = "Dealership's country may not be null or empty")
     private String country;
 
-    @Email
+    @Email(message = "Dealership's email invalid format")
     @NotNull(message = "Dealership's email may not be null")
     private String email;
 
-    @NotEmpty(message = "Dealership's phone number may not be null or empty")
+    @NotNull(message = "Dealership's phone number can not be null")
+    @Pattern(regexp = "^[+](40|49|43|33)\\d{9}", message = "Dealership's phone number invalid")
     private String phoneNumber;
 
     private List<CarDTO> cars = new ArrayList<>();
