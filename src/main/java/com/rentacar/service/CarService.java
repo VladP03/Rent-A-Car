@@ -23,24 +23,20 @@ public class CarService {
         this.carRepository = carRepository;
     }
 
-    public List<CarDTO> getAll() {
-        return CarAdapter.toListDTO(carRepository.findAll());
-    }
-
-    public CarDTO getCar(Integer id) {
-        Optional<Car> carFounded = carRepository.findById(id);
-
-        if (carFounded.isPresent()) {
-            return CarAdapter.toDTO(carFounded.get());
+    public List<CarDTO> getCar(Integer id, String brandName) {
+        if (id == null && brandName == null) {
+            return CarAdapter.toListDTO(carRepository.findAll());
         } else {
-            throw new CarNotFoundException(id);
+            Optional<List<Car>> carFounded = carRepository.findByIDOrBrandName(id, brandName);
+
+            if (carFounded.isPresent()) {
+                return CarAdapter.toListDTO(carFounded.get());
+            } else if (brandName == null){
+                throw new CarNotFoundException(id);
+            } else {
+                throw new CarNotFoundException(brandName);
+            }
         }
-    }
-
-    public List<CarDTO> getCarsWithBrandName(String brandName) {
-        Optional<List<Car>> carDTOList = carRepository.findAllByBrandName(brandName.toUpperCase());
-
-        return carDTOList.map(CarAdapter::toListDTO).orElse(null);
     }
 
     @Validated(OnCreate.class)
@@ -86,7 +82,7 @@ public class CarService {
     }
 
     @Validated(OnUpdate.class)
-    public CarDTO pathcCar(CarDTO carDTO) {
+    public CarDTO patchCar(CarDTO carDTO) {
         Optional<Car> carFounded = carRepository.findById(carDTO.getID());
 
         if (carFounded.isPresent()) {

@@ -19,18 +19,8 @@ public class CarController {
     }
 
     @GetMapping
-    private ResponseEntity<List<CarDTO>> getAll() {
-        return ResponseEntity.ok(carService.getAll());
-    }
-
-    @GetMapping("/{id}")
-    private ResponseEntity<CarDTO> getCar(@PathVariable Integer id) {
-        return ResponseEntity.ok(carService.getCar(id));
-    }
-
-    @GetMapping("/{brandName}")
-    private ResponseEntity<List<CarDTO>> getCarsWithBrandName(@PathVariable String brandName) {
-        return ResponseEntity.ok(carService.getCarsWithBrandName(brandName));
+    private ResponseEntity<List<CarDTO>> getCar(@RequestParam(required = false) Integer id, @RequestParam(required = false) String brandName ) {
+        return ResponseEntity.ok(carService.getCar(id, brandName));
     }
 
     @PostMapping
@@ -49,7 +39,7 @@ public class CarController {
     }
 
     @PatchMapping
-    private ResponseEntity<CarDTO> pathcCar(@RequestBody CarDTO carDTO) {
-        return ResponseEntity.ok(carService.pathcCar(carDTO));
+    private ResponseEntity<CarDTO> patchCar(@RequestBody CarDTO carDTO) {
+        return ResponseEntity.ok(carService.patchCar(carDTO));
     }
 }

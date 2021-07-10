@@ -1,9 +1,9 @@
 package com.rentacar.service.exceptions.car;
 
-import com.rentacar.model.CarDTO;
 
 public class CarNotFoundException extends RuntimeException{
-    private final Integer id;
+    private Integer id = null;
+    private String brandName = null;
     private String message = "Car not found.";
     private String debugMessage = "No car in database with that ID";
 
@@ -11,9 +11,18 @@ public class CarNotFoundException extends RuntimeException{
         this.id = id;
     }
 
+    public CarNotFoundException(String brandName) {
+        this.brandName = brandName;
+    }
+
+
     @Override
     public String getMessage() {
-        message += " In database does not exists an car with id " + id + ".";
+        if (brandName == null) {
+            message += " In database does not exists an car with id " + id + ".";
+        } else {
+            message += " In database does not exists an car with brand name " + brandName + ".";
+        }
 
         return message;
     }

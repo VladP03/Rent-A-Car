@@ -30,16 +30,17 @@ public class TestCarRepository {
 
     @BeforeEach
     void init() {
-        baseCarDTO = new CarDTO()
-                .setID(null)
-                .setBrandName("Test")
-                .setName("Test")
-                .setVIN("Test")
-                .setFirstRegistration(2018)
-                .setEngineCapacity(2000)
-                .setFuel("gas")
-                .setMileage(0d)
-                .setGearbox("manual");
+        baseCarDTO = CarDTO.builder()
+                .ID(null)
+                .brandName("Test")
+                .name("Test")
+                .VIN("Test")
+                .firstRegistration(2018)
+                .engineCapacity(2000)
+                .fuel("gas")
+                .mileage(0d)
+                .gearbox("manual")
+                .build();
 
         namesToUpper(baseCarDTO);
 
@@ -141,17 +142,37 @@ public class TestCarRepository {
     @Test
     void testCarGet_CarNotFoundException_IdNotInDB() {
         baseCarDTO.setID(1);
+        baseCarDTO.setBrandName(null);
+
+        Mockito.when(carRepositoryMock.findByIDOrBrandName(baseCarDTO.getID(), baseCarDTO.getBrandName())).thenReturn(Optional.empty());
 
         CarNotFoundException exception = assertThrows(
                 CarNotFoundException.class,
-                () -> carService.getCar(baseCarDTO.getID())
+                () -> carService.getCar(baseCarDTO.getID(),baseCarDTO.getBrandName())
         );
 
         assertEquals("Car not found. In database does not exists an car with id " + baseCarDTO.getID() + ".", exception.getMessage());
     }
 
     @Test
+    void testCarGet_CarNotFoundException_brandNameNotInDB() {
+        baseCarDTO.setID(null);
+        baseCarDTO.setBrandName("Test");
+
+        Mockito.when(carRepositoryMock.findByIDOrBrandName(baseCarDTO.getID(), baseCarDTO.getBrandName())).thenReturn(Optional.empty());
+
+        CarNotFoundException exception = assertThrows(
+                CarNotFoundException.class,
+                () -> carService.getCar(baseCarDTO.getID(), baseCarDTO.getBrandName())
+        );
+
+        assertEquals("Car not found. In database does not exists an car with brand name " + baseCarDTO.getBrandName() + ".", exception.getMessage());
+    }
+
+    @Test
     void testCarUpdate_IdNotInDB() {
+        baseCarDTO.setID(null);
+        baseCarDTO.setBrandName("Test");
 
         CarNotFoundException exception = assertThrows(
                 CarNotFoundException.class,
@@ -235,13 +256,16 @@ public class TestCarRepository {
 
     @Test
     void testCarDelete_CarDoesNotExistsInDB() {
+        baseCarDTO.setID(1);
+
+        Mockito.when(carRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.empty());
 
         CarNotFoundException exception = assertThrows(
                 CarNotFoundException.class,
-                () -> carService.deleteCar(Mockito.anyInt())
+                () -> carService.deleteCar(baseCarDTO.getID())
         );
 
-        assertEquals("Car not found. In database does not exists an car with id " + 0 + ".", exception.getMessage());
+        assertEquals("Car not found. In database does not exists an car with id " + baseCarDTO.getID() + ".", exception.getMessage());
     }
 
     @Test
@@ -266,7 +290,7 @@ public class TestCarRepository {
         baseCar.setName("NewCar");
         baseCar.setBrandName("NewCar");
 
-        CarDTO patchedCarDTO = carService.pathcCar(baseCarDTO);
+        CarDTO patchedCarDTO = carService.patchCar(baseCarDTO);
 
         assertEquals(patchedCarDTO, baseCarDTO);
     }
@@ -276,7 +300,7 @@ public class TestCarRepository {
 
         CarNotFoundException exception = assertThrows(
                 CarNotFoundException.class,
-                () -> carService.pathcCar(baseCarDTO)
+                () -> carService.patchCar(baseCarDTO)
         );
 
         assertEquals("Car not found. In database does not exists an car with id " + baseCarDTO.getID() + ".", exception.getMessage());
@@ -292,7 +316,7 @@ public class TestCarRepository {
 
         CarFirstRegistrationException exception = assertThrows(
                 CarFirstRegistrationException.class,
-                () -> carService.pathcCar(baseCarDTO)
+                () -> carService.patchCar(baseCarDTO)
         );
 
         assertEquals("Car first registration can not be older than 10 years, year introduced: " + baseCarDTO.getFirstRegistration() +
@@ -309,7 +333,7 @@ public class TestCarRepository {
 
         CarFirstRegistrationException exception = assertThrows(
                 CarFirstRegistrationException.class,
-                () -> carService.pathcCar(baseCarDTO)
+                () -> carService.patchCar(baseCarDTO)
         );
 
         assertEquals("Car first registration can not be greater than current year, year introduced: " + baseCarDTO.getFirstRegistration() +
@@ -327,7 +351,7 @@ public class TestCarRepository {
 
         CarFuelException exception = assertThrows(
                 CarFuelException.class,
-                () -> carService.pathcCar(baseCarDTO)
+                () -> carService.patchCar(baseCarDTO)
         );
 
         assertEquals("Car fuel is incorrect. Fuel introduced: " + baseCarDTO.getFuel() + ". Error on the following car: " +
@@ -346,7 +370,7 @@ public class TestCarRepository {
 
         CarGearboxException exception = assertThrows(
                 CarGearboxException.class,
-                () -> carService.pathcCar(baseCarDTO)
+                () -> carService.patchCar(baseCarDTO)
         );
 
         assertEquals("Car gearbox is incorrect. Gearbox introduced: " + baseCarDTO.getGearbox() + ". Error on the following car: " +
