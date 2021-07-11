@@ -170,6 +170,22 @@ public class TestCarRepository {
     }
 
     @Test
+    void testCarGet_CarNotFoundException_IdAndBrandNameNotInDB() {
+        baseCarDTO.setID(1);
+        baseCarDTO.setBrandName("Test");
+
+        Mockito.when(carRepositoryMock.findByIDAndBrandName(baseCarDTO.getID(), baseCarDTO.getBrandName())).thenReturn(Optional.empty());
+
+        CarNotFoundException exception = assertThrows(
+                CarNotFoundException.class,
+                () -> carService.getCar(baseCarDTO.getID(), baseCarDTO.getBrandName())
+        );
+
+        assertEquals("Car not found. In database does not exists an car with id " + baseCarDTO.getID() + " and brand name " +baseCarDTO.getBrandName() + ".", exception.getMessage());
+    }
+
+
+    @Test
     void testCarUpdate_IdNotInDB() {
         baseCarDTO.setID(null);
         baseCarDTO.setBrandName("Test");

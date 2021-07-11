@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface CarRepository extends JpaRepository<Car, Integer> {
     Optional<Car> findByVIN(String VIN);
     Optional<List<Car>> findByIDOrBrandName(Integer id, String brandName);
+    Optional<List<Car>> findByIDAndBrandName(Integer id, String brandName);
 }

@@ -26,7 +26,16 @@ public class CarService {
     public List<CarDTO> getCar(Integer id, String brandName) {
         if (id == null && brandName == null) {
             return CarAdapter.toListDTO(carRepository.findAll());
-        } else {
+        } else if (id != null && brandName != null) {
+            Optional<List<Car>> carFounded = carRepository.findByIDAndBrandName(id, brandName);
+
+            if (carFounded.isPresent()) {
+                return CarAdapter.toListDTO(carFounded.get());
+            } else {
+                throw  new CarNotFoundException(id, brandName);
+            }
+        }
+        else {
             Optional<List<Car>> carFounded = carRepository.findByIDOrBrandName(id, brandName);
 
             if (carFounded.isPresent()) {

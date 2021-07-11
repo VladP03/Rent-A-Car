@@ -5,26 +5,29 @@ import com.rentacar.model.CarDTO;
 import java.util.Calendar;
 
 public class CarFirstRegistrationException extends RuntimeException{
-    private final CarDTO carDTO;
     private String message = "Car first registration can not be ";
-    private final Integer maxYear = Calendar.getInstance().get(Calendar.YEAR);
-    private final Integer minYear = maxYear - 10;
-    private final String debugMessage = "Car's first registration must be between " + minYear + " and " + maxYear;
+    private final String debugMessage;
+
+    private final int maxYear = Calendar.getInstance().get(Calendar.YEAR);
+    private final int minYear = maxYear - 10;
 
     public CarFirstRegistrationException(CarDTO carDTO) {
-        this.carDTO = carDTO;
+        olderOrGreater(carDTO.getFirstRegistration());
+
+        message += " Error on the following car: " + carDTO.getBrandName() + " " + carDTO.getName() + ", with VIN: " + carDTO.getVIN() + ".";
+        debugMessage = "Car's first registration must be between " + minYear + " and " + maxYear;
+    }
+
+    private void olderOrGreater(Integer firstRegistration) {
+        if (firstRegistration > maxYear) {
+            message += "greater than current year, year introduced: " + firstRegistration + ".";
+        } else if (firstRegistration < minYear) {
+            message += "older than 10 years, year introduced: " + firstRegistration + ".";
+        }
     }
 
     @Override
     public String getMessage() {
-        if (carDTO.getFirstRegistration() > Calendar.getInstance().get(Calendar.YEAR)) {
-            message += "greater than current year, year introduced: " + carDTO.getFirstRegistration() + ".";
-        } else if (carDTO.getFirstRegistration() < Calendar.getInstance().get(Calendar.YEAR) - 10) {
-            message += "older than 10 years, year introduced: " + carDTO.getFirstRegistration() + ".";
-        }
-
-        message += " Error on the following car: " + carDTO.getBrandName() + " " + carDTO.getName() + ", with VIN: " + carDTO.getVIN() + ".";
-
         return message;
     }
 
