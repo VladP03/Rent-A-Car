@@ -5,7 +5,6 @@ import com.rentacar.model.adapters.CityAdapter;
 import com.rentacar.repository.city.City;
 import com.rentacar.repository.city.CityRepository;
 import com.rentacar.service.CityService;
-import com.rentacar.service.exceptions.car.CarAlreadyExistsException;
 import com.rentacar.service.exceptions.city.CityAlreadyExistsException;
 import com.rentacar.service.exceptions.city.CityNotFoundException;
 import org.junit.jupiter.api.Assertions;
@@ -17,7 +16,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class TestCityRepository {
 
     private CityDTO baseCityDTO;
-    private City baseCity;
 
     @Mock
     private CityRepository cityRepositoryMock;
@@ -35,18 +33,71 @@ public class TestCityRepository {
 
     @BeforeEach
     void init() {
-        baseCityDTO = new CityDTO()
-                .setId(null)
-                .setName("TEST");
+        baseCityDTO = CityDTO.builder()
+                .id(null)
+                .name("TEST")
+                .build();
+    }
 
-        baseCity = CityAdapter.fromDTO(baseCityDTO);
+    @Test
+    void TestGetCity_ValidParameters() {
+        baseCityDTO.setId(1);
+
+        Mockito.when(cityRepositoryMock.findByIdAndName(baseCityDTO.getId(), baseCityDTO.getName())).thenReturn(Optional.of(Collections.singletonList(CityAdapter.fromDTO(baseCityDTO))));
+
+        List<CityDTO> cityListFounded = cityService.getCity(baseCityDTO.getId(), baseCityDTO.getName());
+
+        Assertions.assertEquals(CityAdapter.toListDTO(Collections.singletonList(CityAdapter.fromDTO(baseCityDTO))), cityListFounded);
+    }
+
+    @Test
+    void TestGetCity_IdNull() {
+
+        Mockito.when(cityRepositoryMock.findByIdOrName(baseCityDTO.getId(), baseCityDTO.getName())).thenReturn(Optional.empty());
+
+        CityNotFoundException exception = assertThrows(
+                CityNotFoundException.class,
+                () -> cityService.getCity(baseCityDTO.getId(), baseCityDTO.getName())
+        );
+
+        assertEquals("City not found. In database does not exists an city with name " + baseCityDTO.getName() + ".", exception.getMessage());
+    }
+    @Test
+    void TestGetCity_NameNull() {
+        baseCityDTO.setId(1);
+        baseCityDTO.setName(null);
+
+        Mockito.when(cityRepositoryMock.findByIdOrName(baseCityDTO.getId(), baseCityDTO.getName())).thenReturn(Optional.empty());
+
+        CityNotFoundException exception = assertThrows(
+                CityNotFoundException.class,
+                () -> cityService.getCity(baseCityDTO.getId(), baseCityDTO.getName())
+        );
+
+        assertEquals("City not found. In database does not exists an city with id " + baseCityDTO.getId() + ".", exception.getMessage());
+    }
+
+    @Test
+    void TestGetCity_IdAndNameNull() {
+        baseCityDTO.setName(null);
+
+        CityDTO goodCityDTO = CityDTO.builder()
+                .id(1)
+                .name("TEST")
+                .build();
+
+        Mockito.when(cityRepositoryMock.findAll()).thenReturn(Collections.singletonList(CityAdapter.fromDTO(goodCityDTO)));
+
+        List<CityDTO> cityListFounded = cityService.getCity(baseCityDTO.getId(), baseCityDTO.getName());
+
+        assertEquals(Collections.singletonList(goodCityDTO), cityListFounded);
     }
 
     @Test
     void TestCreateCity_ValidParameters() {
 
         Mockito.when(cityRepositoryMock.findByName(Mockito.anyString())).thenReturn(Optional.empty());
-        Mockito.when(cityRepositoryMock.save(Mockito.any(City.class))).thenReturn(baseCity);
+        Mockito.when(cityRepositoryMock.save(Mockito.any(City.class))).thenReturn(CityAdapter.fromDTO(baseCityDTO));
 
         CityDTO cityCreated = cityService.createCity(baseCityDTO);
 

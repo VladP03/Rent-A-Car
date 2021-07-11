@@ -9,7 +9,7 @@ import javax.validation.Valid;
 import java.util.*;
 
 @RestController
-@RequestMapping("v1/cities")
+@RequestMapping("v1/city")
 public class CityController {
 
     private final CityService cityService;
@@ -19,8 +19,8 @@ public class CityController {
     }
 
     @GetMapping
-    private ResponseEntity<List<CityDTO>> getAllCities() {
-        return ResponseEntity.ok(cityService.getAllCountries());
+    private ResponseEntity<List<CityDTO>> getCity(@RequestParam(required = false) Integer id, @RequestParam(required = false) String name) {
+        return ResponseEntity.ok(cityService.getCity(id, name));
     }
 
     @PostMapping

@@ -23,8 +23,29 @@ public class CityService {
         this.cityRepository = cityRepository;
     }
 
-    public List<CityDTO> getAllCountries() {
-        return CityAdapter.toListDTO(cityRepository.findAll());
+    public List<CityDTO> getCity(Integer id, String name) {
+        if (id == null && name == null) {
+            return CityAdapter.toListDTO(cityRepository.findAll());
+        } else if (id != null && name != null) {
+            Optional<List<City>> cityFounded = cityRepository.findByIdAndName(id, name);
+
+            if (cityFounded.isPresent()) {
+                return CityAdapter.toListDTO(cityFounded.get());
+            } else {
+                throw  new CityNotFoundException(id, name);
+            }
+        }
+        else {
+            Optional<List<City>> cityFounded = cityRepository.findByIdOrName(id, name);
+
+            if (cityFounded.isPresent()) {
+                return CityAdapter.toListDTO(cityFounded.get());
+            } else if (name == null){
+                throw new CityNotFoundException(id);
+            } else {
+                throw new CityNotFoundException(name);
+            }
+        }
     }
 
     @Validated(OnCreate.class)
