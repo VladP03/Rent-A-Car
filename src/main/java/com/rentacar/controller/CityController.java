@@ -25,16 +25,16 @@ public class CityController {
 
     @PostMapping
     private ResponseEntity<CityDTO> createCity(@Valid @RequestBody CityDTO cityDTO) {
-        return ResponseEntity.ok(cityService.createCity(cityDTO));
+        return ResponseEntity.ok(cityService.createCityAdmin(cityDTO));
     }
 
     @PutMapping
     private ResponseEntity<CityDTO> updateCity(@Valid @RequestBody CityDTO cityDTO) {
-        return ResponseEntity.ok(cityService.updateCity(cityDTO));
+        return ResponseEntity.ok(cityService.updateCityAdmin(cityDTO));
     }
 
     @DeleteMapping("/{id}")
     private ResponseEntity<CityDTO> deleteCity(@PathVariable Integer id) {
-        return ResponseEntity.ok(cityService.deleteCity(id));
+        return ResponseEntity.ok(cityService.deleteCityAdmin(id));
     }
 }

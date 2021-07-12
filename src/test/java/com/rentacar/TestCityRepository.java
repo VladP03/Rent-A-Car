@@ -94,14 +94,95 @@ public class TestCityRepository {
     }
 
     @Test
-    void TestCreateCity_ValidParameters() {
+    void TestCreateCityAdmin_ValidParameters() {
 
         Mockito.when(cityRepositoryMock.findByName(Mockito.anyString())).thenReturn(Optional.empty());
         Mockito.when(cityRepositoryMock.save(Mockito.any(City.class))).thenReturn(CityAdapter.fromDTO(baseCityDTO));
 
-        CityDTO cityCreated = cityService.createCity(baseCityDTO);
+        CityDTO cityCreated = cityService.createCityAdmin(baseCityDTO);
 
         Assertions.assertEquals(baseCityDTO, cityCreated);
+    }
+
+    @Test
+    void TestCreateCityAdmin_CityAlreadyExists() {
+
+        Mockito.when(cityRepositoryMock.findByName(Mockito.anyString())).thenReturn(Optional.ofNullable(CityAdapter.fromDTO(baseCityDTO)));
+
+        CityAlreadyExistsException exception = assertThrows(
+                CityAlreadyExistsException.class,
+                () -> cityService.createCityAdmin(baseCityDTO)
+        );
+
+        assertEquals("City already exists. Error on the following city: " + baseCityDTO.getName(), exception.getMessage());
+    }
+
+    @Test
+    void TestUpdateCityAdmin_ValidParameters() {
+        baseCityDTO.setId(1);
+
+        Mockito.when(cityRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.ofNullable(CityAdapter.fromDTO(baseCityDTO)));
+        Mockito.when(cityRepositoryMock.findByName(Mockito.anyString())).thenReturn(Optional.empty());
+        Mockito.when(cityRepositoryMock.save(Mockito.any(City.class))).thenReturn(CityAdapter.fromDTO(baseCityDTO));
+
+        CityDTO cityUpdated = cityService.updateCityAdmin(baseCityDTO);
+
+        Assertions.assertEquals(baseCityDTO, cityUpdated);
+    }
+
+    @Test
+    void TestUpdateCityAdmin_CityDoesNotExists() {
+        baseCityDTO.setId(1);
+
+        Mockito.when(cityRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.empty());
+        Mockito.when(cityRepositoryMock.findByName(Mockito.anyString())).thenReturn(Optional.empty());
+
+        CityNotFoundException exception = assertThrows(
+                CityNotFoundException.class,
+                () -> cityService.updateCityAdmin(baseCityDTO)
+        );
+
+        assertEquals("City not found. In database does not exists an city with id " + baseCityDTO.getId() + ".", exception.getMessage());
+    }
+
+    @Test
+    void TestUpdateCityAdmin_CityAlreadyExists() {
+        baseCityDTO.setId(1);
+
+        Mockito.when(cityRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.ofNullable(CityAdapter.fromDTO(baseCityDTO)));
+        Mockito.when(cityRepositoryMock.findByName(Mockito.anyString())).thenReturn(Optional.ofNullable(CityAdapter.fromDTO(baseCityDTO)));
+
+        CityAlreadyExistsException exception = assertThrows(
+                CityAlreadyExistsException.class,
+                () -> cityService.updateCityAdmin(baseCityDTO)
+        );
+
+        assertEquals("City already exists. Error on the following city: " + baseCityDTO.getName(), exception.getMessage());
+    }
+
+    @Test
+    void TestDeleteCityAdmin_ValidParameters() {
+        baseCityDTO.setId(1);
+
+        Mockito.when(cityRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.ofNullable(CityAdapter.fromDTO(baseCityDTO)));
+
+        CityDTO cityDeleted = cityService.deleteCityAdmin(baseCityDTO.getId());
+
+        Assertions.assertEquals(baseCityDTO, cityDeleted);
+    }
+
+    @Test
+    void TestDeleteCityAdmin_CityNotFound() {
+        baseCityDTO.setId(1);
+
+        Mockito.when(cityRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.empty());
+
+        CityNotFoundException exception = assertThrows(
+                CityNotFoundException.class,
+                () -> cityService.deleteCityAdmin(baseCityDTO.getId())
+        );
+
+        assertEquals("City not found. In database does not exists an city with id " + baseCityDTO.getId() + ".", exception.getMessage());
     }
 
     @Test
@@ -115,19 +196,6 @@ public class TestCityRepository {
         );
 
         assertEquals("City already exists. Error on the following city: " + baseCityDTO.getName(), exception.getMessage());
-    }
-
-    @Test
-    void TestUpdateCity_ValidParameters() {
-        baseCityDTO.setId(1);
-
-        Mockito.when(cityRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.ofNullable(CityAdapter.fromDTO(baseCityDTO)));
-        Mockito.when(cityRepositoryMock.findByName(Mockito.anyString())).thenReturn(Optional.empty());
-        Mockito.when(cityRepositoryMock.save(Mockito.any(City.class))).thenReturn(CityAdapter.fromDTO(baseCityDTO));
-
-        CityDTO cityUpdated = cityService.updateCity(baseCityDTO);
-
-        Assertions.assertEquals(baseCityDTO, cityUpdated);
     }
 
     @Test
@@ -158,17 +226,6 @@ public class TestCityRepository {
         );
 
         assertEquals("City already exists. Error on the following city: " + baseCityDTO.getName(), exception.getMessage());
-    }
-
-    @Test
-    void TestDeleteCity_ValidParameters() {
-        baseCityDTO.setId(1);
-
-        Mockito.when(cityRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.ofNullable(CityAdapter.fromDTO(baseCityDTO)));
-
-        CityDTO cityDeleted = cityService.deleteCity(baseCityDTO.getId());
-
-        Assertions.assertEquals(baseCityDTO, cityDeleted);
     }
 
     @Test

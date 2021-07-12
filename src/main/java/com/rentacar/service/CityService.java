@@ -11,6 +11,7 @@ import com.rentacar.service.exceptions.city.CityNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
 import java.util.*;
 
 @Component
@@ -34,8 +35,7 @@ public class CityService {
             } else {
                 throw  new CityNotFoundException(id, name);
             }
-        }
-        else {
+        } else {
             Optional<List<City>> cityFounded = cityRepository.findByIdOrName(id, name);
 
             if (cityFounded.isPresent()) {
@@ -49,7 +49,46 @@ public class CityService {
     }
 
     @Validated(OnCreate.class)
-    public CityDTO createCity(CityDTO cityDTO) {
+    public void createCity(@Valid CityDTO cityDTO) {
+        nameToUpper(cityDTO);
+
+        Optional<City> cityFounded = cityRepository.findByName(cityDTO.getName());
+
+        if (cityFounded.isPresent()) {
+            throw new CityAlreadyExistsException(CityAdapter.toDTO(cityFounded.get()));
+        }
+    }
+
+    @Validated(OnUpdate.class)
+    public void updateCity(@Valid CityDTO cityDTO) {
+        nameToUpper(cityDTO);
+
+        Optional<City> cityFoundedById = cityRepository.findById(cityDTO.getId());
+        Optional<City> cityFoundedByName = cityRepository.findByName(cityDTO.getName());
+
+        if (!cityFoundedById.isPresent()) {
+            throw new CityNotFoundException(cityDTO.getId());
+        }
+
+        if (cityFoundedByName.isPresent()) {
+            throw new CityAlreadyExistsException(CityAdapter.toDTO(cityFoundedByName.get()));
+        }
+    }
+
+    public void deleteCity(Integer id) {
+
+        Optional<City> cityFounded = cityRepository.findById(id);
+
+        if (!cityFounded.isPresent()) {
+            throw new CityNotFoundException(id);
+        }
+    }
+
+
+    // Admin
+
+    @Validated(OnCreate.class)
+    public CityDTO createCityAdmin(CityDTO cityDTO) {
         nameToUpper(cityDTO);
 
         Optional<City> cityFounded = cityRepository.findByName(cityDTO.getName());
@@ -63,7 +102,7 @@ public class CityService {
     }
 
     @Validated(OnUpdate.class)
-    public CityDTO updateCity(CityDTO cityDTO) {
+    public CityDTO updateCityAdmin(CityDTO cityDTO) {
         nameToUpper(cityDTO);
 
         Optional<City> cityFoundedById = cityRepository.findById(cityDTO.getId());
@@ -80,7 +119,7 @@ public class CityService {
         }
     }
 
-    public CityDTO deleteCity(Integer id) {
+    public CityDTO deleteCityAdmin(Integer id) {
 
         Optional<City> cityFounded = cityRepository.findById(id);
 
