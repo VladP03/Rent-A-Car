@@ -3,6 +3,8 @@ package com.rentacar.service.exceptions;
 import com.rentacar.service.exceptions.car.*;
 import com.rentacar.service.exceptions.city.CityAlreadyExistsException;
 import com.rentacar.service.exceptions.city.CityNotFoundException;
+import com.rentacar.service.exceptions.country.CountryAlreadyExistsException;
+import com.rentacar.service.exceptions.country.CountryNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +33,26 @@ public class ExceptionsHandlerAdvice extends ResponseEntityExceptionHandler {
         return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), "");
     }
 
+
+    /* Country Expcetions */
+
+    @ExceptionHandler(CountryAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ApiError onCountryAlreadyExistsException(CountryAlreadyExistsException exception) {
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
+    }
+
+    @ExceptionHandler(CountryNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ApiError onCountryNotFoundException(CountryNotFoundException exception) {
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
+    }
+
+
+    /* City Expcetions */
+
     @ExceptionHandler(CityAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
@@ -44,6 +66,9 @@ public class ExceptionsHandlerAdvice extends ResponseEntityExceptionHandler {
     public ApiError onCityNotFoundException(CityNotFoundException exception) {
         return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
     }
+
+
+    /* Car Expcetions */
 
     @ExceptionHandler(CarNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
