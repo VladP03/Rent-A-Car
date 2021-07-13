@@ -27,4 +27,47 @@ public class CountryDTO {
     private String phoneNumber;
 
     private List<CityDTO> cityList;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (! (obj instanceof CountryDTO)) {
+            return false;
+        }
+
+        if (this == obj) {
+            return true;
+        }
+
+        CountryDTO countryDTO = (CountryDTO) obj;
+
+        if (this.getId() == null && countryDTO.getId() == null) {
+
+        } else if ((this.getId() != null && countryDTO.getId() == null) || (this.getId() == null && countryDTO.getId() != null)) {
+            return false;
+        } else if (!this.getId().equals(countryDTO.getId())) {
+            return false;
+        }
+
+        if (this.getName() == null && countryDTO.getName() == null) {
+
+        } else if ((this.getName() != null && countryDTO.getName() == null) || (this.getName() == null && countryDTO.getName() != null)) {
+            return false;
+        } else if (!this.getName().equals(countryDTO.getName())) {
+            return false;
+        }
+
+        if (!this.getPhoneNumber().equals(countryDTO.getPhoneNumber())) {
+            return false;
+        }
+
+        if (!this.getCityList().containsAll(countryDTO.getCityList()) && !countryDTO.getCityList().containsAll(this.getCityList())) {
+            return false;
+        }
+
+        return true;
+    }
 }

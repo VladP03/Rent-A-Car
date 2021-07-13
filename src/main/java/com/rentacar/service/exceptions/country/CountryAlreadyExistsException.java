@@ -9,7 +9,7 @@ public class CountryAlreadyExistsException extends RuntimeException {
     public CountryAlreadyExistsException(CountryDTO countryDTO, String... parameters) {
         message = "Country already exists. Error on the following country: " + countryDTO.getName();
 
-        if (parameters != null) {
+        if (parameters.length > 0) {
             if (parameters.length == 1) {
                 debugMessage = "Be careful at these parameter: " + parameters[0];
             } else {
