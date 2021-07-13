@@ -99,7 +99,7 @@ public class CountryService {
             if (countryDTO.getName() != null) {
                 nameToUpper(countryDTO);
 
-                if (existsName(countryDTO.getName())) {
+                if (!existsName(countryDTO.getName())) {
                     countryFoundedById.get().setName(countryDTO.getName());
 
                     return CountryAdapter.toDTO(countryRepository.save(countryFoundedById.get()));
@@ -109,7 +109,7 @@ public class CountryService {
             }
 
             if (countryDTO.getPhoneNumber() != null) {
-                if (existsPhoneNumber(countryDTO.getPhoneNumber())) {
+                if (!existsPhoneNumber(countryDTO.getPhoneNumber())) {
                     countryFoundedById.get().setPhoneNumber(countryDTO.getPhoneNumber());
 
                     return CountryAdapter.toDTO(countryRepository.save(countryFoundedById.get()));

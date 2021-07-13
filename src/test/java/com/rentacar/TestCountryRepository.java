@@ -234,7 +234,6 @@ public class TestCountryRepository {
     void TestUpdateCountry_IdInvalid(){
 
         Mockito.when(countryRepositoryMock.findById(baseCountryDTO.getId())).thenReturn(Optional.empty());
-        Mockito.when(countryRepositoryMock.findByName(baseCountryDTO.getName())).thenReturn(Optional.empty());
 
         CountryNotFoundException exception = assertThrows(
                 CountryNotFoundException.class,
@@ -258,9 +257,47 @@ public class TestCountryRepository {
         assertEquals("Country already exists. Error on the following country: " + baseCountryDTO.getName(), exception.getMessage());
     }
 
-    // patch
+    @Test
+    void TestPatchCountry_IdInvalid(){
 
-    //
+        Mockito.when(countryRepositoryMock.findById(baseCountryDTO.getId())).thenReturn(Optional.empty());
+
+        CountryNotFoundException exception = assertThrows(
+                CountryNotFoundException.class,
+                () -> countryService.patchCountry(baseCountryDTO)
+        );
+
+        assertEquals("Country not found. In database does not exists an country with id " + baseCountryDTO.getId() + ".", exception.getMessage());
+    }
+
+    @Test
+    void TestPatchCountry_UpdateName_NameAlreadyExists(){
+
+        Mockito.when(countryRepositoryMock.findById(baseCountryDTO.getId())).thenReturn(Optional.of(CountryAdapter.fromDTO(baseCountryDTO)));
+        Mockito.when(countryRepositoryMock.findByName(baseCountryDTO.getName())).thenReturn(Optional.of(CountryAdapter.fromDTO(baseCountryDTO)));
+
+        CountryAlreadyExistsException exception = assertThrows(
+                CountryAlreadyExistsException.class,
+                () -> countryService.patchCountry(baseCountryDTO)
+        );
+
+        assertEquals("Country already exists. Error on the following country: " + baseCountryDTO.getName(), exception.getMessage());
+    }
+
+    @Test
+    void TestPatchCountry_UpdatePhoneNumber_PhoneAlreadyExists(){
+        baseCountryDTO.setName(null);
+
+        Mockito.when(countryRepositoryMock.findById(baseCountryDTO.getId())).thenReturn(Optional.of(CountryAdapter.fromDTO(baseCountryDTO)));
+        Mockito.when(countryRepositoryMock.findByPhoneNumber(baseCountryDTO.getPhoneNumber())).thenReturn(Optional.of(CountryAdapter.fromDTO(baseCountryDTO)));
+
+        CountryAlreadyExistsException exception = assertThrows(
+                CountryAlreadyExistsException.class,
+                () -> countryService.patchCountry(baseCountryDTO)
+        );
+
+        assertEquals("Country already exists. Error on the following country: " + baseCountryDTO.getName(), exception.getMessage());
+    }
 
     @Test
     void TestDeleteCountry_ValidParameters(){
