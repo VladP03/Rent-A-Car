@@ -1,6 +1,8 @@
 package com.rentacar.repository.dealership;
 
 import com.rentacar.repository.car.Car;
+import com.rentacar.repository.city.City;
+import com.rentacar.repository.country.Country;
 import lombok.*;
 
 import javax.persistence.*;
@@ -17,10 +19,17 @@ public class Dealership {
     private Integer ID;
 
     private String name;
-    private String city;
-    private String country;
+
+//    @Column(unique = true)
     private String email;
-    private String phoneNumber;
+
+    @OneToOne
+    @JoinColumn(name="CITY_ID")
+    private City city;
+
+    @OneToOne
+    @JoinColumn(name="COUNTRY_ID")
+    private Country country;
 
     @OneToMany(orphanRemoval=true, cascade = CascadeType.ALL)
     @JoinColumn(name="DEALER_ID") // join column is in table for Order

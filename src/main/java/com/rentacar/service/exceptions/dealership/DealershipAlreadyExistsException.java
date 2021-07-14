@@ -3,19 +3,29 @@ package com.rentacar.service.exceptions.dealership;
 import com.rentacar.model.DealershipDTO;
 
 public class DealershipAlreadyExistsException extends RuntimeException{
-    private final DealershipDTO dealershipDTO;
-    private String message = "Dealership already exists.";
-    private final String debugMessage = "Change name, country, city, email or phone number";
+    private String message;
+    private String debugMessage;
 
-    public DealershipAlreadyExistsException(DealershipDTO dealershipDTO) {
-        this.dealershipDTO = dealershipDTO;
+    public DealershipAlreadyExistsException(DealershipDTO dealershipDTO, String... parameters) {
+        message = "Dealership already exists. Error on the following country: " + dealershipDTO.getName();
+
+        if (parameters.length > 0) {
+            if (parameters.length == 1) {
+                debugMessage = "Be careful at these parameter: " + parameters[0];
+            } else {
+                debugMessage = "Be careful at these parameters: ";
+                for (int i=0;i<parameters.length-1;i++) {
+                    debugMessage += parameters[i] + ", ";
+                }
+                debugMessage += parameters[parameters.length-1] + ".";
+            }
+        } else {
+            debugMessage = "";
+        }
     }
 
     @Override
     public String getMessage() {
-        message += " Error on the following dealership: " + dealershipDTO.getName() + " from " + dealershipDTO.getCountry() + ", " + dealershipDTO.getCity() +
-                    " with email: " + dealershipDTO.getEmail() + " and phone number: " + dealershipDTO.getPhoneNumber();
-
         return message;
     }
 

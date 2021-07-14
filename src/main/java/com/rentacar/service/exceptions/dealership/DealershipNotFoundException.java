@@ -1,23 +1,32 @@
 package com.rentacar.service.exceptions.dealership;
 
 public class DealershipNotFoundException extends RuntimeException{
-
-    private final Integer id;
     private String message = "Dealership not found.";
-    private String debugMessage = "No dealership in database with that ID";
+    private final String debugMessage;
 
     public DealershipNotFoundException(Integer id) {
-        this.id = id;
+        message += " In database does not exists an dealership with id " + id + ".";
+        debugMessage = "No dealership in database with that ID";
     }
+
+    public DealershipNotFoundException(String name) {
+        message += " In database does not exists an dealership with name " + name + ".";
+        debugMessage = "No dealership in database with that name";
+    }
+
+    public DealershipNotFoundException(Integer id, String name) {
+        message += " In database does not exists an dealership with id " + id + " and name " + name + ".";
+        debugMessage = "No dealership in database with that ID and name";
+    }
+
 
     @Override
     public String getMessage() {
-        message += " In database does not exists an dealership with id " + id + ".";
-
         return message;
     }
 
     public String getDebugMessage() {
         return debugMessage;
     }
+
 }

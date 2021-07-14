@@ -20,19 +20,15 @@ public class DealershipDTO {
     @NotEmpty(message = "Dealership's name may not be null or empty")
     private String name;
 
-    @NotEmpty(message = "Dealership's city may not be null or empty")
-    private String city;
+    @NotNull(message = "Dealership's city may not be null or empty")
+    private CityDTO city;
 
-    @NotEmpty(message = "Dealership's country may not be null or empty")
-    private String country;
+    @NotNull(message = "Dealership's country may not be null or empty")
+    private CountryDTO country;
 
     @Email(message = "Dealership's email invalid format")
     @NotNull(message = "Dealership's email may not be null")
     private String email;
-
-    @NotNull(message = "Dealership's phone number can not be null")
-    @Pattern(regexp = "^[+](40|49|43|33)\\d{9}", message = "Dealership's phone number invalid")
-    private String phoneNumber;
 
     private List<CarDTO> cars;
 }

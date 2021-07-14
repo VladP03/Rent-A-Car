@@ -20,22 +20,12 @@ public class DealershipController {
     }
 
     @GetMapping
-    private ResponseEntity<List<DealershipDTO>> getAll() {
-        return ResponseEntity.ok(dealershipService.getAll());
+    private ResponseEntity<List<DealershipDTO>> getDealership(@RequestParam(required = false) Integer id, @RequestParam(required = false) String name) {
+        return ResponseEntity.ok(dealershipService.getDealership(id, name));
     }
 
     @PostMapping
     private ResponseEntity<DealershipDTO> createDealership(@Valid @RequestBody DealershipDTO dealershipDTO) {
         return ResponseEntity.ok(dealershipService.createDealership(dealershipDTO));
-    }
-
-    @PostMapping("/{id}")
-    private ResponseEntity<DealershipDTO> addCarToDealership(@PathVariable Integer id, @Valid @RequestBody List<CarDTO> carDTOList) {
-        return ResponseEntity.ok(dealershipService.addACarsToDealership(id, carDTOList));
-    }
-
-    @PutMapping
-    private ResponseEntity<DealershipDTO> updateDealership(@Valid @RequestBody DealershipDTO dealershipDTO) {
-        return ResponseEntity.ok(dealershipService.updateDealership(dealershipDTO));
     }
 }

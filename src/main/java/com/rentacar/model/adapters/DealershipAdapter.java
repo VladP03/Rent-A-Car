@@ -12,10 +12,9 @@ public class DealershipAdapter {
         return DealershipDTO.builder()
                 .ID(dealership.getID())
                 .name(dealership.getName())
-                .city(dealership.getCity())
-                .country(dealership.getCountry())
+                .city(CityAdapter.toDTO(dealership.getCity()))
+                .country(CountryAdapter.toDTO(dealership.getCountry()))
                 .email(dealership.getEmail())
-                .phoneNumber(dealership.getPhoneNumber())
                 .cars(CarAdapter.toListDTO(dealership.getCars()))
                 .build();
     }
@@ -24,10 +23,9 @@ public class DealershipAdapter {
         return Dealership.builder()
                 .ID(dealershipDTO.getID())
                 .name(dealershipDTO.getName())
-                .city(dealershipDTO.getCity())
-                .country(dealershipDTO.getCountry())
+                .city(CityAdapter.fromDTO(dealershipDTO.getCity()))
+                .country(CountryAdapter.fromDTO(dealershipDTO.getCountry()))
                 .email(dealershipDTO.getEmail())
-                .phoneNumber(dealershipDTO.getPhoneNumber())
                 .cars(CarAdapter.fromListDTO(dealershipDTO.getCars()))
                 .build();
     }
