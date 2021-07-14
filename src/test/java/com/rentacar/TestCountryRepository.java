@@ -311,6 +311,19 @@ public class TestCountryRepository {
     }
 
     @Test
+    void TestPatchCountry_AddNewCities_IdInvalid(){
+
+        Mockito.when(countryRepositoryMock.findById(baseCountryDTO.getId())).thenReturn(Optional.empty());
+
+        CountryNotFoundException exception = assertThrows(
+                CountryNotFoundException.class,
+                () -> countryService.patchCountryAddCities(baseCountryDTO.getId(), Collections.singletonList(CityDTO.builder().id(null).name(null).build()))
+        );
+
+        assertEquals("Country not found. In database does not exists an country with id " + baseCountryDTO.getId() + ".", exception.getMessage());
+    }
+
+    @Test
     void TestDeleteCountry_IdInvalid(){
         baseCountryDTO.setId(1);
 
