@@ -134,6 +134,26 @@ public class CountryService {
         return CountryAdapter.toDTO(countryFoundedById.get());
     }
 
+    @Validated(OnCreate.class)
+    public CountryDTO patchCountryAddCities(Integer id, List<CityDTO> cityDTOList) {
+
+        Optional<Country> countryFoundedById = countryRepository.findById(id);
+
+        if (countryFoundedById.isPresent()) {
+            for (CityDTO cityDTO : cityDTOList) {
+                cityService.createCity(cityDTO);
+            }
+
+            countryFoundedById.get().getCityList().addAll(CityAdapter.fromListDTO(cityDTOList));
+            countryRepository.save(countryFoundedById.get());
+
+            return CountryAdapter.toDTO(countryFoundedById.get());
+
+        } else {
+            throw new CountryNotFoundException(id);
+        }
+    }
+
     public CountryDTO deleteCountry(Integer id) {
 
         Optional<Country> countryFounded = countryRepository.findById(id);

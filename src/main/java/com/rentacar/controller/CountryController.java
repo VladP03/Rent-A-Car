@@ -1,5 +1,6 @@
 package com.rentacar.controller;
 
+import com.rentacar.model.CityDTO;
 import com.rentacar.model.CountryDTO;
 import com.rentacar.service.CountryService;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,11 @@ public class CountryController
     @PatchMapping
     private ResponseEntity<CountryDTO> patchCountry(@RequestBody CountryDTO countryDTO) {
         return ResponseEntity.ok(countryService.patchCountry(countryDTO));
+    }
+
+    @PatchMapping("/{id}")
+    private ResponseEntity<CountryDTO> pathCountryAddCities(@PathVariable Integer id, @Valid @RequestBody List<CityDTO> cityList) {
+        return ResponseEntity.ok(countryService.patchCountryAddCities(id, cityList));
     }
 
     @DeleteMapping("/{id}")
