@@ -29,7 +29,6 @@ public class DealershipDTO {
 
     @Email(message = "Dealership's email invalid format")
     @NotNull(message = "Dealership's email may not be null")
-    @Column(unique = true)
     private String email;
 
     private List<CarDTO> cars;

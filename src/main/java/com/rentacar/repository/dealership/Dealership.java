@@ -19,6 +19,8 @@ public class Dealership {
     private Integer ID;
 
     private String name;
+
+    @Column(unique = true)
     private String email;
 
     @OneToOne
