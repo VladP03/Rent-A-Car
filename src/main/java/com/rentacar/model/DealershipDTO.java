@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.Column;
 import javax.validation.constraints.*;
 import java.util.*;
 
@@ -28,6 +29,7 @@ public class DealershipDTO {
 
     @Email(message = "Dealership's email invalid format")
     @NotNull(message = "Dealership's email may not be null")
+    @Column(unique = true)
     private String email;
 
     private List<CarDTO> cars;
