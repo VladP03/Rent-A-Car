@@ -20,7 +20,7 @@ public class Dealership {
 
     private String name;
 
-//    @Column(unique = true)
+    @Column(unique = true)
     private String email;
 
     @OneToOne

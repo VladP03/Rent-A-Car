@@ -4,14 +4,13 @@ import java.util.*;
 
 import com.rentacar.model.CarDTO;
 import com.rentacar.model.DealershipDTO;
-import com.rentacar.model.adapters.CityAdapter;
 import com.rentacar.model.adapters.DealershipAdapter;
 import com.rentacar.model.validations.OnCreate;
 import com.rentacar.repository.dealership.Dealership;
 import com.rentacar.repository.dealership.DealershipRepository;
+import com.rentacar.service.exceptions.dataIntegrity.EmailConstraintException;
 import com.rentacar.service.exceptions.dealership.DealershipAlreadyExistsException;
 import com.rentacar.service.exceptions.dealership.DealershipNotFoundException;
-import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -78,10 +77,25 @@ public class DealershipService {
                 throw new RuntimeException();
             }
 
-            return DealershipAdapter.toDTO(dealershipRepository.save(DealershipAdapter.fromDTO(dealershipDTO)));
+            try {
+                return DealershipAdapter.toDTO(dealershipRepository.save(DealershipAdapter.fromDTO(dealershipDTO)));
+            } catch (DataIntegrityViolationException exception) {
+                if (!isUniqueEmail(dealershipDTO.getEmail())) {
+                    throw new EmailConstraintException(dealershipDTO.getClass(), dealershipDTO.getEmail());
+                }
+            }
         } else {
             throw new DealershipAlreadyExistsException(DealershipAdapter.toDTO(dealershipFounded.get()));
         }
+
+        return null;
+    }
+
+
+    private boolean isUniqueEmail(String email) {
+        Optional<Dealership> dealershipFounded = dealershipRepository.findByEmail(email);
+
+        return !dealershipFounded.isPresent();
     }
 
 
