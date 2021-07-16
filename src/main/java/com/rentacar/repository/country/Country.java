@@ -4,6 +4,8 @@ import com.rentacar.repository.city.City;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.util.*;
 
 @Entity
@@ -18,7 +20,11 @@ public class Country {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "countrySeq")
     private Integer id;
 
+    @Column(unique = true)
     private String name;
+
+    @Pattern(regexp = "[+]\\d{2}")
+    @Column(length = 3, unique = true)
     private String phoneNumber;
 
     @OneToMany(orphanRemoval=true, cascade = CascadeType.ALL)

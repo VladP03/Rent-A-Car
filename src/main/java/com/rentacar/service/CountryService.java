@@ -6,10 +6,13 @@ import com.rentacar.model.adapters.CityAdapter;
 import com.rentacar.model.adapters.CountryAdapter;
 import com.rentacar.model.validations.OnCreate;
 import com.rentacar.model.validations.OnUpdate;
+import com.rentacar.repository.city.City;
 import com.rentacar.repository.country.Country;
 import com.rentacar.repository.country.CountryRepository;
-import com.rentacar.service.exceptions.country.CountryAlreadyExistsException;
 import com.rentacar.service.exceptions.country.CountryNotFoundException;
+import com.rentacar.service.exceptions.dataIntegrity.NameUniqueConstraintException;
+import com.rentacar.service.exceptions.dataIntegrity.PhoneNumberUniqueConstraintException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
@@ -31,62 +34,105 @@ public class CountryService {
     public List<CountryDTO> getCountry(Integer id, String name) {
         if (id == null && name == null) {
             return CountryAdapter.toListDTO(countryRepository.findAll());
+
         } else if (id != null && name != null) {
-            Optional<List<Country>> countryFounded = countryRepository.findByIdAndName(id, name);
+
+            name = name.toUpperCase();
+            Optional<Country> countryFounded = countryRepository.findByIdAndName(id, name);
 
             if (countryFounded.isPresent()) {
-                return CountryAdapter.toListDTO(countryFounded.get());
+                return CountryAdapter.toListDTO(Collections.singletonList(countryFounded.get()));
             } else {
-                throw  new CountryNotFoundException(id, name);
+                throw new CountryNotFoundException(id, name);
             }
-        } else {
-            Optional<List<Country>> countryFounded = countryRepository.findByIdOrName(id, name);
+        } else if (name != null){
+
+            name = name.toUpperCase();
+            Optional<Country> countryFounded = countryRepository.findByName(name);
 
             if (countryFounded.isPresent()) {
-                return CountryAdapter.toListDTO(countryFounded.get());
-            } else if (name == null){
-               throw new CountryNotFoundException(id);
+                return CountryAdapter.toListDTO(Collections.singletonList(countryFounded.get()));
             } else {
                 throw new CountryNotFoundException(name);
+            }
+        } else {
+
+            Optional<Country> countryFounded = countryRepository.findById(id);
+
+            if (countryFounded.isPresent()) {
+                return CountryAdapter.toListDTO(Collections.singletonList(countryFounded.get()));
+            } else {
+                throw new CountryNotFoundException(id);
             }
         }
     }
 
     @Validated(OnCreate.class)
     public CountryDTO createCountry(@Valid CountryDTO countryDTO) {
+        CountryDTO countryCreated = null;
+
         nameToUpper(countryDTO);
 
-        if (!existsName(countryDTO.getName()) && !existsPhoneNumber(countryDTO.getPhoneNumber())) {
-            for (CityDTO cityDTO : countryDTO.getCityList()) {
-                cityService.createCity(cityDTO);
+        for (CityDTO cityDTO : countryDTO.getCityList()) {
+            cityService.createCity(cityDTO);
+        }
+
+        try {
+            countryCreated = CountryAdapter.toDTO(countryRepository.save(CountryAdapter.fromDTO(countryDTO)));
+        } catch (DataIntegrityViolationException exception) {
+
+            if (!isUniqueCountryName(countryDTO.getName())) {
+                throw new NameUniqueConstraintException(Country.class, countryDTO.getName());
             }
 
-            return CountryAdapter.toDTO(countryRepository.save(CountryAdapter.fromDTO(countryDTO)));
+            if (!isUniquePhoneNumber(countryDTO.getPhoneNumber())) {
+                throw new PhoneNumberUniqueConstraintException(Country.class, countryDTO.getPhoneNumber());
+            }
 
-        } else if (existsName(countryDTO.getName()) && existsPhoneNumber(countryDTO.getPhoneNumber())) {
-            throw new CountryAlreadyExistsException(countryDTO, "name", "phone number");
-        } else if (existsName(countryDTO.getName())) {
-            throw new CountryAlreadyExistsException(countryDTO, "name");
-        } else {
-            throw new CountryAlreadyExistsException(countryDTO, "phone number");
+            for (CityDTO cityDTO : countryDTO.getCityList()) {
+                if (!cityService.isNameUnique(cityDTO.getName())) {
+                    throw new NameUniqueConstraintException(City.class, cityDTO.getName());
+                }
+            }
         }
+
+        return countryCreated;
     }
 
     @Validated(OnUpdate.class)
     public CountryDTO updateCountry(@Valid CountryDTO countryDTO) {
-        nameToUpper(countryDTO);
 
-        if (existsID(countryDTO.getId()) && !existsName(countryDTO.getName())) {
+        if (existsID(countryDTO.getId())) {
+            CountryDTO countryUpdated = null;
+
+            nameToUpper(countryDTO);
+
             for (CityDTO cityDTO : countryDTO.getCityList()) {
                 cityService.createCity(cityDTO);
             }
 
-            return CountryAdapter.toDTO(countryRepository.save(CountryAdapter.fromDTO(countryDTO)));
+            try {
+                countryUpdated =  CountryAdapter.toDTO(countryRepository.save(CountryAdapter.fromDTO(countryDTO)));
+            } catch (DataIntegrityViolationException exception) {
 
-        } else if (!existsID(countryDTO.getId())) {
-            throw new CountryNotFoundException(countryDTO.getId());
+                if (!isUniqueCountryName(countryDTO.getName())) {
+                    throw new NameUniqueConstraintException(Country.class, countryDTO.getName());
+                }
+
+                if (!isUniquePhoneNumber(countryDTO.getPhoneNumber())) {
+                    throw new PhoneNumberUniqueConstraintException(Country.class, countryDTO.getPhoneNumber());
+                }
+
+                for (CityDTO cityDTO : countryDTO.getCityList()) {
+                    if (!cityService.isNameUnique(cityDTO.getName())) {
+                        throw new NameUniqueConstraintException(City.class, cityDTO.getName());
+                    }
+                }
+            }
+
+            return countryUpdated;
         } else {
-            throw new CountryAlreadyExistsException(countryDTO);
+            throw new CountryNotFoundException(countryDTO.getId());
         }
     }
 
@@ -99,22 +145,22 @@ public class CountryService {
             if (countryDTO.getName() != null) {
                 nameToUpper(countryDTO);
 
-                if (!existsName(countryDTO.getName())) {
-                    countryFoundedById.get().setName(countryDTO.getName());
+                countryFoundedById.get().setName(countryDTO.getName());
 
-                    return CountryAdapter.toDTO(countryRepository.save(countryFoundedById.get()));
-                } else {
-                    throw new CountryAlreadyExistsException(countryDTO, "name");
+                try {
+                    countryRepository.save(countryFoundedById.get());
+                } catch (DataIntegrityViolationException exception) {
+                    throw new NameUniqueConstraintException(Country.class, countryDTO.getName());
                 }
             }
 
             if (countryDTO.getPhoneNumber() != null) {
-                if (!existsPhoneNumber(countryDTO.getPhoneNumber())) {
-                    countryFoundedById.get().setPhoneNumber(countryDTO.getPhoneNumber());
+                countryFoundedById.get().setPhoneNumber(countryDTO.getPhoneNumber());
 
-                    return CountryAdapter.toDTO(countryRepository.save(countryFoundedById.get()));
-                } else {
-                    throw new CountryAlreadyExistsException(countryDTO, "phone number");
+                try {
+                    countryRepository.save(countryFoundedById.get());
+                } catch (DataIntegrityViolationException exception) {
+                    throw new PhoneNumberUniqueConstraintException(Country.class, countryDTO.getPhoneNumber());
                 }
             }
 
@@ -123,14 +169,23 @@ public class CountryService {
                     cityService.createCity(cityDTO);
                 }
 
-                countryFoundedById.get().setCityList(CityAdapter.fromListDTO(countryDTO.getCityList()));
-                return CountryAdapter.toDTO(countryRepository.save(countryFoundedById.get()));
+                countryFoundedById.get().getCityList().clear();
+                countryFoundedById.get().getCityList().addAll(CityAdapter.fromListDTO(countryDTO.getCityList()));
+
+                try {
+                    countryRepository.save(countryFoundedById.get());
+                } catch (DataIntegrityViolationException exception) {
+                    for (CityDTO cityDTO : countryDTO.getCityList()) {
+                        if (!cityService.isNameUnique(cityDTO.getName())) {
+                            throw new NameUniqueConstraintException(City.class, cityDTO.getName());
+                        }
+                    }
+                }
             }
         } else {
             throw new CountryNotFoundException(countryDTO.getId());
         }
 
-        // Totul trimis a fost null
         return CountryAdapter.toDTO(countryFoundedById.get());
     }
 
@@ -143,12 +198,19 @@ public class CountryService {
             for (CityDTO cityDTO : cityDTOList) {
                 cityService.createCity(cityDTO);
             }
-
             countryFoundedById.get().getCityList().addAll(CityAdapter.fromListDTO(cityDTOList));
-            countryRepository.save(countryFoundedById.get());
+
+            try {
+                countryRepository.save(countryFoundedById.get());
+            } catch (DataIntegrityViolationException exception) {
+                for (CityDTO cityDTO : cityDTOList) {
+                    if (!cityService.isNameUnique(cityDTO.getName())) {
+                        throw new NameUniqueConstraintException(City.class, cityDTO.getName());
+                    }
+                }
+            }
 
             return CountryAdapter.toDTO(countryFoundedById.get());
-
         } else {
             throw new CountryNotFoundException(id);
         }
@@ -175,16 +237,16 @@ public class CountryService {
         return countryFoundedById.isPresent();
     }
 
-    private boolean existsPhoneNumber(String phoneNumber) {
-        Optional<Country> countryFoundedByPhoneNumber = countryRepository.findByPhoneNumber(phoneNumber);
+    private boolean isUniqueCountryName(String name) {
+        Optional<Country> countryFounded = countryRepository.findByName(name);
 
-        return countryFoundedByPhoneNumber.isPresent();
+        return !countryFounded.isPresent();
     }
 
-    private boolean existsName(String name) {
-        Optional<Country> countryFoundedByName = countryRepository.findByName(name);
+    private boolean isUniquePhoneNumber(String phoneNumber) {
+        Optional<Country> countryFounded = countryRepository.findByPhoneNumber(phoneNumber);
 
-        return countryFoundedByName.isPresent();
+        return !countryFounded.isPresent();
     }
 
 
