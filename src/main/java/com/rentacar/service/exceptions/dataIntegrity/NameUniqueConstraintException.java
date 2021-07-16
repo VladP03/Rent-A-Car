@@ -3,12 +3,17 @@ package com.rentacar.service.exceptions.dataIntegrity;
 import lombok.Getter;
 
 @Getter
-public class CityNameUniqueConstraintException extends RuntimeException {
+public class NameUniqueConstraintException extends RuntimeException {
     private final String message;
     private final String debugMessage;
 
-    public CityNameUniqueConstraintException(Class className, String name) {
-        this.message = "City name unique constraint violated on " + className.getSimpleName() + ", name: " + name + " already exists.";
-        debugMessage = "Change email";
+    public NameUniqueConstraintException(Class className) {
+        this.message = "Name unique constraint violated on " + className.getSimpleName();
+        debugMessage = "Change name";
+    }
+
+    public NameUniqueConstraintException(Class className, String name) {
+        this.message = "Name unique constraint violated on " + className.getSimpleName() + ", name: " + name + " already exists.";
+        debugMessage = "Change name";
     }
 }

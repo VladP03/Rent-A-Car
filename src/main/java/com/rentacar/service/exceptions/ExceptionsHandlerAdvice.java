@@ -2,7 +2,6 @@ package com.rentacar.service.exceptions;
 
 import com.rentacar.service.exceptions.car.*;
 import com.rentacar.service.exceptions.city.CityNotFoundException;
-import com.rentacar.service.exceptions.country.CountryAlreadyExistsException;
 import com.rentacar.service.exceptions.country.CountryNotFoundException;
 import com.rentacar.service.exceptions.dataIntegrity.NameUniqueConstraintException;
 import com.rentacar.service.exceptions.dataIntegrity.EmailUniqueConstraintException;
@@ -59,13 +58,6 @@ public class ExceptionsHandlerAdvice extends ResponseEntityExceptionHandler {
 
 
     /* Country Expcetions */
-
-    @ExceptionHandler(CountryAlreadyExistsException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public ApiError onCountryAlreadyExistsException(CountryAlreadyExistsException exception) {
-        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
-    }
 
     @ExceptionHandler(CountryNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

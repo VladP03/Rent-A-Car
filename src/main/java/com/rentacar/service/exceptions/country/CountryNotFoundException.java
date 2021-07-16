@@ -1,5 +1,8 @@
 package com.rentacar.service.exceptions.country;
 
+import lombok.Getter;
+
+@Getter
 public class CountryNotFoundException extends RuntimeException {
     private String message = "Country not found.";
     private final String debugMessage;
@@ -17,14 +20,5 @@ public class CountryNotFoundException extends RuntimeException {
     public CountryNotFoundException(Integer id, String name) {
         message += " In database does not exists an country with id " + id + " and name " + name + ".";
         debugMessage = "No country in database with that ID and name";
-    }
-
-    @Override
-    public String getMessage() {
-        return message;
-    }
-
-    public String getDebugMessage() {
-        return debugMessage;
     }
 }
