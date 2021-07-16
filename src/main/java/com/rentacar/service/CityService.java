@@ -31,6 +31,7 @@ public class CityService {
 
         } else if (id != null && name != null) {
 
+            name = name.toUpperCase();
             Optional<City> cityFounded = cityRepository.findByIdAndName(id, name);
 
             if (cityFounded.isPresent()) {
@@ -38,16 +39,24 @@ public class CityService {
             } else {
                 throw  new CityNotFoundException(id, name);
             }
-        } else {
+        } else if (name != null){
 
-            Optional<City> cityFounded = cityRepository.findByIdOrName(id, name);
+            name = name.toUpperCase();
+            Optional<City> cityFounded = cityRepository.findByName(name);
 
             if (cityFounded.isPresent()) {
                 return CityAdapter.toListDTO(Collections.singletonList(cityFounded.get()));
-            } else if (name == null){
-                throw new CityNotFoundException(id);
             } else {
                 throw new CityNotFoundException(name);
+            }
+        } else {
+
+            Optional<City> cityFounded = cityRepository.findById(id);
+
+            if (cityFounded.isPresent()) {
+                return CityAdapter.toListDTO(Collections.singletonList(cityFounded.get()));
+            } else {
+                throw new CityNotFoundException(id);
             }
         }
     }
@@ -76,18 +85,18 @@ public class CityService {
     // Admin
 
     @Validated(OnCreate.class)
-    public CityDTO createCityAdmin(CityDTO cityDTO) {
+    public CityDTO createCityAdmin(@Valid CityDTO cityDTO) {
         nameToUpper(cityDTO);
 
         try {
             return CityAdapter.toDTO(cityRepository.save(CityAdapter.fromDTO(cityDTO)));
         } catch (DataIntegrityViolationException exception) {
-            throw new NameUniqueConstraintException(cityDTO.getClass(), cityDTO.getName());
+            throw new NameUniqueConstraintException(City.class, cityDTO.getName());
         }
     }
 
     @Validated(OnUpdate.class)
-    public CityDTO updateCityAdmin(CityDTO cityDTO) {
+    public CityDTO updateCityAdmin(@Valid CityDTO cityDTO) {
 
         if (existsCityById(cityDTO.getId())) {
             nameToUpper(cityDTO);
@@ -95,7 +104,7 @@ public class CityService {
             try {
                 return CityAdapter.toDTO(cityRepository.save(CityAdapter.fromDTO(cityDTO)));
             } catch (DataIntegrityViolationException exception) {
-                throw new NameUniqueConstraintException(cityDTO.getClass(), cityDTO.getName());
+                throw new NameUniqueConstraintException(City.class, cityDTO.getName());
             }
         } else {
             throw new CityNotFoundException(cityDTO.getId());
