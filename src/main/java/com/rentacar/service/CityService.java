@@ -6,8 +6,9 @@ import com.rentacar.model.validations.OnCreate;
 import com.rentacar.model.validations.OnUpdate;
 import com.rentacar.repository.city.City;
 import com.rentacar.repository.city.CityRepository;
-import com.rentacar.service.exceptions.city.CityAlreadyExistsException;
 import com.rentacar.service.exceptions.city.CityNotFoundException;
+import com.rentacar.service.exceptions.dataIntegrity.NameUniqueConstraintException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
@@ -27,19 +28,22 @@ public class CityService {
     public List<CityDTO> getCity(Integer id, String name) {
         if (id == null && name == null) {
             return CityAdapter.toListDTO(cityRepository.findAll());
+
         } else if (id != null && name != null) {
-            Optional<List<City>> cityFounded = cityRepository.findByIdAndName(id, name);
+
+            Optional<City> cityFounded = cityRepository.findByIdAndName(id, name);
 
             if (cityFounded.isPresent()) {
-                return CityAdapter.toListDTO(cityFounded.get());
+                return CityAdapter.toListDTO(Collections.singletonList(cityFounded.get()));
             } else {
                 throw  new CityNotFoundException(id, name);
             }
         } else {
-            Optional<List<City>> cityFounded = cityRepository.findByIdOrName(id, name);
+
+            Optional<City> cityFounded = cityRepository.findByIdOrName(id, name);
 
             if (cityFounded.isPresent()) {
-                return CityAdapter.toListDTO(cityFounded.get());
+                return CityAdapter.toListDTO(Collections.singletonList(cityFounded.get()));
             } else if (name == null){
                 throw new CityNotFoundException(id);
             } else {
@@ -51,35 +55,19 @@ public class CityService {
     @Validated(OnCreate.class)
     public void createCity(@Valid CityDTO cityDTO) {
         nameToUpper(cityDTO);
-
-        Optional<City> cityFounded = cityRepository.findByName(cityDTO.getName());
-
-        if (cityFounded.isPresent()) {
-            throw new CityAlreadyExistsException(CityAdapter.toDTO(cityFounded.get()));
-        }
     }
 
     @Validated(OnUpdate.class)
     public void updateCity(@Valid CityDTO cityDTO) {
-        nameToUpper(cityDTO);
-
-        Optional<City> cityFoundedById = cityRepository.findById(cityDTO.getId());
-        Optional<City> cityFoundedByName = cityRepository.findByName(cityDTO.getName());
-
-        if (!cityFoundedById.isPresent()) {
+        if (!existsCityById(cityDTO.getId())) {
             throw new CityNotFoundException(cityDTO.getId());
         }
 
-        if (cityFoundedByName.isPresent()) {
-            throw new CityAlreadyExistsException(CityAdapter.toDTO(cityFoundedByName.get()));
-        }
+        nameToUpper(cityDTO);
     }
 
     public void deleteCity(Integer id) {
-
-        Optional<City> cityFounded = cityRepository.findById(id);
-
-        if (!cityFounded.isPresent()) {
+        if (!existsCityById(id)) {
             throw new CityNotFoundException(id);
         }
     }
@@ -91,31 +79,26 @@ public class CityService {
     public CityDTO createCityAdmin(CityDTO cityDTO) {
         nameToUpper(cityDTO);
 
-        Optional<City> cityFounded = cityRepository.findByName(cityDTO.getName());
-
-        if (!cityFounded.isPresent()) {
-
+        try {
             return CityAdapter.toDTO(cityRepository.save(CityAdapter.fromDTO(cityDTO)));
-        } else {
-            throw new CityAlreadyExistsException(CityAdapter.toDTO(cityFounded.get()));
+        } catch (DataIntegrityViolationException exception) {
+            throw new NameUniqueConstraintException(cityDTO.getClass(), cityDTO.getName());
         }
     }
 
     @Validated(OnUpdate.class)
     public CityDTO updateCityAdmin(CityDTO cityDTO) {
-        nameToUpper(cityDTO);
 
-        Optional<City> cityFoundedById = cityRepository.findById(cityDTO.getId());
-        Optional<City> cityFoundedByName = cityRepository.findByName(cityDTO.getName());
-
-        if (cityFoundedById.isPresent() && !cityFoundedByName.isPresent()) {
+        if (existsCityById(cityDTO.getId())) {
             nameToUpper(cityDTO);
 
-            return CityAdapter.toDTO(cityRepository.save(CityAdapter.fromDTO(cityDTO)));
-        } else if (!cityFoundedById.isPresent()) {
-            throw new CityNotFoundException(cityDTO.getId());
+            try {
+                return CityAdapter.toDTO(cityRepository.save(CityAdapter.fromDTO(cityDTO)));
+            } catch (DataIntegrityViolationException exception) {
+                throw new NameUniqueConstraintException(cityDTO.getClass(), cityDTO.getName());
+            }
         } else {
-            throw new CityAlreadyExistsException(CityAdapter.toDTO(cityFoundedByName.get()));
+            throw new CityNotFoundException(cityDTO.getId());
         }
     }
 
@@ -130,6 +113,20 @@ public class CityService {
         } else {
             throw new CityNotFoundException(id);
         }
+    }
+
+
+
+    private boolean existsCityById(Integer id) {
+        Optional<City> cityFounded = cityRepository.findById(id);
+
+        return cityFounded.isPresent();
+    }
+
+    protected boolean isNameUnique(String name) {
+        Optional<City> cityFounded = cityRepository.findByName(name);
+
+        return !cityFounded.isPresent();
     }
 
 

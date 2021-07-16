@@ -1,10 +1,12 @@
 package com.rentacar.service.exceptions;
 
 import com.rentacar.service.exceptions.car.*;
-import com.rentacar.service.exceptions.city.CityAlreadyExistsException;
 import com.rentacar.service.exceptions.city.CityNotFoundException;
 import com.rentacar.service.exceptions.country.CountryAlreadyExistsException;
 import com.rentacar.service.exceptions.country.CountryNotFoundException;
+import com.rentacar.service.exceptions.dataIntegrity.NameUniqueConstraintException;
+import com.rentacar.service.exceptions.dataIntegrity.EmailUniqueConstraintException;
+import com.rentacar.service.exceptions.dataIntegrity.PhoneNumberUniqueConstraintException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,11 +28,33 @@ public class ExceptionsHandlerAdvice extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(new ApiError(status, ex.getMessage(), ""), status);
     }
 
+
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ApiError onConstraintViolationException(ConstraintViolationException exception) {
         return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), "");
+    }
+
+    @ExceptionHandler(EmailUniqueConstraintException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ApiError onEmailConstraintException(EmailUniqueConstraintException exception) {
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
+    }
+
+    @ExceptionHandler(NameUniqueConstraintException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ApiError onNameUniqueConstraintException(NameUniqueConstraintException exception) {
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
+    }
+
+    @ExceptionHandler(PhoneNumberUniqueConstraintException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ApiError onPhoneNumberUniqueConstrantException(PhoneNumberUniqueConstraintException exception) {
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
     }
 
 
@@ -52,13 +76,6 @@ public class ExceptionsHandlerAdvice extends ResponseEntityExceptionHandler {
 
 
     /* City Expcetions */
-
-    @ExceptionHandler(CityAlreadyExistsException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public ApiError onCityAlreadyExistsException(CityAlreadyExistsException exception) {
-        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
-    }
 
     @ExceptionHandler(CityNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
