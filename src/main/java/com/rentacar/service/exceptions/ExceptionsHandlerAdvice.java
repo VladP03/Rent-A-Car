@@ -7,6 +7,8 @@ import com.rentacar.service.exceptions.dataIntegrity.NameUniqueConstraintExcepti
 import com.rentacar.service.exceptions.dataIntegrity.EmailUniqueConstraintException;
 import com.rentacar.service.exceptions.dataIntegrity.PhoneNumberUniqueConstraintException;
 import com.rentacar.service.exceptions.dataIntegrity.VinUniqueConstraintException;
+import com.rentacar.service.exceptions.dealership.DealershipCityInvalidException;
+import com.rentacar.service.exceptions.dealership.DealershipNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,6 +65,23 @@ public class ExceptionsHandlerAdvice extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ApiError onVinUniqueConstraintException(VinUniqueConstraintException exception) {
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
+    }
+
+
+    /* Dealership Exceptions */
+
+    @ExceptionHandler(DealershipCityInvalidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ApiError onDealershipCityInvalidException(DealershipCityInvalidException exception) {
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
+    }
+
+    @ExceptionHandler(DealershipNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ApiError onDealershipNotFoundException(DealershipNotFoundException exception) {
         return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
     }
 

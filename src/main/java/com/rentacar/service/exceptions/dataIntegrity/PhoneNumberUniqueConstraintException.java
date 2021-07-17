@@ -1,6 +1,7 @@
 package com.rentacar.service.exceptions.dataIntegrity;
 
 import com.rentacar.model.CountryDTO;
+import com.rentacar.model.DealershipDTO;
 import lombok.Getter;
 
 @Getter
@@ -10,6 +11,11 @@ public class PhoneNumberUniqueConstraintException extends RuntimeException{
 
     public PhoneNumberUniqueConstraintException(CountryDTO countryDTO) {
         this.message = "Phone number unique constraint violated on Country, phone number: " + countryDTO.getPhoneNumber() + " already exists.";
+        debugMessage = "Change email";
+    }
+
+    public PhoneNumberUniqueConstraintException(DealershipDTO dealershipDTO) {
+        this.message = "Phone number unique constraint violated on Dealership, phone number: " + dealershipDTO.getPhoneNumber() + " already exists.";
         debugMessage = "Change email";
     }
 }

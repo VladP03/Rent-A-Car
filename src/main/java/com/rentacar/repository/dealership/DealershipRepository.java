@@ -13,4 +13,5 @@ public interface DealershipRepository extends JpaRepository<Dealership, Integer>
     Optional<Dealership> findByNameAndCity(String name, City city);
     Optional<Dealership> findByName(String name);
     Optional<Dealership> findByEmail(String email);
+    Optional<Dealership> findByPhoneNumber(String phoneNumber);
 }

@@ -23,6 +23,9 @@ public class Dealership {
     @Column(unique = true)
     private String email;
 
+    @Column(unique = true)
+    private String phoneNumber;
+
     @OneToOne
     @JoinColumn(name="CITY_ID")
     private City city;

@@ -15,6 +15,7 @@ public class DealershipAdapter {
                 .city(CityAdapter.toDTO(dealership.getCity()))
                 .country(CountryAdapter.toDTO(dealership.getCountry()))
                 .email(dealership.getEmail())
+                .phoneNumber(dealership.getPhoneNumber())
                 .cars(CarAdapter.toListDTO(dealership.getCars()))
                 .build();
     }
@@ -26,6 +27,7 @@ public class DealershipAdapter {
                 .city(CityAdapter.fromDTO(dealershipDTO.getCity()))
                 .country(CountryAdapter.fromDTO(dealershipDTO.getCountry()))
                 .email(dealershipDTO.getEmail())
+                .phoneNumber(dealershipDTO.getPhoneNumber())
                 .cars(CarAdapter.fromListDTO(dealershipDTO.getCars()))
                 .build();
     }
