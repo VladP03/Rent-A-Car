@@ -6,7 +6,6 @@ import com.rentacar.model.adapters.CityAdapter;
 import com.rentacar.model.adapters.CountryAdapter;
 import com.rentacar.model.validations.OnCreate;
 import com.rentacar.model.validations.OnUpdate;
-import com.rentacar.repository.city.City;
 import com.rentacar.repository.country.Country;
 import com.rentacar.repository.country.CountryRepository;
 import com.rentacar.service.exceptions.country.CountryNotFoundException;
@@ -82,16 +81,16 @@ public class CountryService {
         } catch (DataIntegrityViolationException exception) {
 
             if (!isUniqueCountryName(countryDTO.getName())) {
-                throw new NameUniqueConstraintException(Country.class, countryDTO.getName());
+                throw new NameUniqueConstraintException(countryDTO);
             }
 
             if (!isUniquePhoneNumber(countryDTO.getPhoneNumber())) {
-                throw new PhoneNumberUniqueConstraintException(Country.class, countryDTO.getPhoneNumber());
+                throw new PhoneNumberUniqueConstraintException(countryDTO);
             }
 
             for (CityDTO cityDTO : countryDTO.getCityList()) {
                 if (!cityService.isNameUnique(cityDTO.getName())) {
-                    throw new NameUniqueConstraintException(City.class, cityDTO.getName());
+                    throw new NameUniqueConstraintException(cityDTO);
                 }
             }
         }
@@ -116,16 +115,16 @@ public class CountryService {
             } catch (DataIntegrityViolationException exception) {
 
                 if (!isUniqueCountryName(countryDTO.getName())) {
-                    throw new NameUniqueConstraintException(Country.class, countryDTO.getName());
+                    throw new NameUniqueConstraintException(countryDTO);
                 }
 
                 if (!isUniquePhoneNumber(countryDTO.getPhoneNumber())) {
-                    throw new PhoneNumberUniqueConstraintException(Country.class, countryDTO.getPhoneNumber());
+                    throw new PhoneNumberUniqueConstraintException(countryDTO);
                 }
 
                 for (CityDTO cityDTO : countryDTO.getCityList()) {
                     if (!cityService.isNameUnique(cityDTO.getName())) {
-                        throw new NameUniqueConstraintException(City.class, cityDTO.getName());
+                        throw new NameUniqueConstraintException(cityDTO);
                     }
                 }
             }
@@ -150,7 +149,7 @@ public class CountryService {
                 try {
                     countryRepository.save(countryFoundedById.get());
                 } catch (DataIntegrityViolationException exception) {
-                    throw new NameUniqueConstraintException(Country.class, countryDTO.getName());
+                    throw new NameUniqueConstraintException(countryDTO);
                 }
             }
 
@@ -160,7 +159,7 @@ public class CountryService {
                 try {
                     countryRepository.save(countryFoundedById.get());
                 } catch (DataIntegrityViolationException exception) {
-                    throw new PhoneNumberUniqueConstraintException(Country.class, countryDTO.getPhoneNumber());
+                    throw new PhoneNumberUniqueConstraintException(countryDTO);
                 }
             }
 
@@ -177,7 +176,7 @@ public class CountryService {
                 } catch (DataIntegrityViolationException exception) {
                     for (CityDTO cityDTO : countryDTO.getCityList()) {
                         if (!cityService.isNameUnique(cityDTO.getName())) {
-                            throw new NameUniqueConstraintException(City.class, cityDTO.getName());
+                            throw new NameUniqueConstraintException(cityDTO);
                         }
                     }
                 }
@@ -205,7 +204,7 @@ public class CountryService {
             } catch (DataIntegrityViolationException exception) {
                 for (CityDTO cityDTO : cityDTOList) {
                     if (!cityService.isNameUnique(cityDTO.getName())) {
-                        throw new NameUniqueConstraintException(City.class, cityDTO.getName());
+                        throw new NameUniqueConstraintException(cityDTO);
                     }
                 }
             }

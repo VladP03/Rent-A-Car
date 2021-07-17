@@ -91,7 +91,7 @@ public class CityService {
         try {
             return CityAdapter.toDTO(cityRepository.save(CityAdapter.fromDTO(cityDTO)));
         } catch (DataIntegrityViolationException exception) {
-            throw new NameUniqueConstraintException(City.class, cityDTO.getName());
+            throw new NameUniqueConstraintException(cityDTO);
         }
     }
 
@@ -104,7 +104,7 @@ public class CityService {
             try {
                 return CityAdapter.toDTO(cityRepository.save(CityAdapter.fromDTO(cityDTO)));
             } catch (DataIntegrityViolationException exception) {
-                throw new NameUniqueConstraintException(City.class, cityDTO.getName());
+                throw new NameUniqueConstraintException(cityDTO);
             }
         } else {
             throw new CityNotFoundException(cityDTO.getId());

@@ -1,5 +1,7 @@
 package com.rentacar.service.exceptions.dataIntegrity;
 
+import com.rentacar.model.CityDTO;
+import com.rentacar.model.CountryDTO;
 import lombok.Getter;
 
 @Getter
@@ -7,13 +9,13 @@ public class NameUniqueConstraintException extends RuntimeException {
     private final String message;
     private final String debugMessage;
 
-    public NameUniqueConstraintException(Class className) {
-        this.message = "Name unique constraint violated on " + className.getSimpleName();
+    public NameUniqueConstraintException(CityDTO cityDTO) {
+        this.message = "Name unique constraint violated on City, name: " + cityDTO.getName() + " already exists.";
         debugMessage = "Change name";
     }
 
-    public NameUniqueConstraintException(Class className, String name) {
-        this.message = "Name unique constraint violated on " + className.getSimpleName() + ", name: " + name + " already exists.";
+    public NameUniqueConstraintException(CountryDTO countryDTO) {
+        this.message = "Name unique constraint violated on Country, name: " + countryDTO.getName() + " already exists.";
         debugMessage = "Change name";
     }
 }
