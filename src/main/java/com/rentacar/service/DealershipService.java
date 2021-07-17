@@ -62,12 +62,9 @@ public class DealershipService {
     }
 
     @Validated(OnCreate.class)
-    public DealershipDTO createDealership(@Valid DealershipDTO dealershipDTO) {
-
+    public DealershipDTO createDealership(@Valid DealershipDTO dealershipDTO) throws DataIntegrityViolationException {
         if (countryService.getCountry(dealershipDTO.getCountry().getId(), dealershipDTO.getCountry().getName()) != null) {
             if (cityService.getCity(dealershipDTO.getCity().getId(), dealershipDTO.getCity().getName()) != null) {
-                DealershipDTO dealershipCreated = null;
-
                 namesToUpper(dealershipDTO);
 
                 if (!isCityInCountryCitiesList(dealershipDTO)) {
@@ -81,7 +78,7 @@ public class DealershipService {
                 rewritePhoneNumber(dealershipDTO);
 
                 try {
-                    dealershipCreated = DealershipAdapter.toDTO(dealershipRepository.save(DealershipAdapter.fromDTO(dealershipDTO)));
+                    return DealershipAdapter.toDTO(dealershipRepository.save(DealershipAdapter.fromDTO(dealershipDTO)));
                 } catch (DataIntegrityViolationException exception) {
                     if (!isUniqueEmail(dealershipDTO.getEmail())) {
                         throw new EmailUniqueConstraintException(dealershipDTO);
@@ -90,9 +87,9 @@ public class DealershipService {
                     if (!isUniquePhoneNumber(dealershipDTO.getPhoneNumber())) {
                         throw new PhoneNumberUniqueConstraintException(dealershipDTO);
                     }
-                }
 
-                return dealershipCreated;
+                    throw new DataIntegrityViolationException(Objects.requireNonNull(exception.getMessage()));
+                }
             } else {
                 throw new CityNotFoundException(dealershipDTO.getCity().getId(), dealershipDTO.getCity().getName());
             }

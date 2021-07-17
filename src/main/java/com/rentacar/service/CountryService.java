@@ -25,17 +25,20 @@ public class CountryService {
     private final CountryRepository countryRepository;
     private final CityService cityService;
 
+
+
     public CountryService(CountryRepository countryRepository, CityService cityService) {
         this.countryRepository = countryRepository;
         this.cityService = cityService;
     }
+
+
 
     public List<CountryDTO> getCountry(Integer id, String name) {
         if (id == null && name == null) {
             return CountryAdapter.toListDTO(countryRepository.findAll());
 
         } else if (id != null && name != null) {
-
             name = name.toUpperCase();
             Optional<Country> countryFounded = countryRepository.findByIdAndName(id, name);
 
@@ -45,7 +48,6 @@ public class CountryService {
                 throw new CountryNotFoundException(id, name);
             }
         } else if (name != null){
-
             name = name.toUpperCase();
             Optional<Country> countryFounded = countryRepository.findByName(name);
 
@@ -55,7 +57,6 @@ public class CountryService {
                 throw new CountryNotFoundException(name);
             }
         } else {
-
             Optional<Country> countryFounded = countryRepository.findById(id);
 
             if (countryFounded.isPresent()) {
@@ -67,9 +68,7 @@ public class CountryService {
     }
 
     @Validated(OnCreate.class)
-    public CountryDTO createCountry(@Valid CountryDTO countryDTO) {
-        CountryDTO countryCreated = null;
-
+    public CountryDTO createCountry(@Valid CountryDTO countryDTO) throws DataIntegrityViolationException {
         nameToUpper(countryDTO);
 
         for (CityDTO cityDTO : countryDTO.getCityList()) {
@@ -77,14 +76,13 @@ public class CountryService {
         }
 
         try {
-            countryCreated = CountryAdapter.toDTO(countryRepository.save(CountryAdapter.fromDTO(countryDTO)));
+            return CountryAdapter.toDTO(countryRepository.save(CountryAdapter.fromDTO(countryDTO)));
         } catch (DataIntegrityViolationException exception) {
-
-            if (!isUniqueCountryName(countryDTO.getName())) {
+            if (!isNameUnique(countryDTO.getName())) {
                 throw new NameUniqueConstraintException(countryDTO);
             }
 
-            if (!isUniquePhoneNumber(countryDTO.getPhoneNumber())) {
+            if (!isPhoneNumberUnique(countryDTO.getPhoneNumber())) {
                 throw new PhoneNumberUniqueConstraintException(countryDTO);
             }
 
@@ -93,17 +91,14 @@ public class CountryService {
                     throw new NameUniqueConstraintException(cityDTO);
                 }
             }
-        }
 
-        return countryCreated;
+            throw new DataIntegrityViolationException(Objects.requireNonNull(exception.getMessage()));
+        }
     }
 
     @Validated(OnUpdate.class)
-    public CountryDTO updateCountry(@Valid CountryDTO countryDTO) {
-
+    public CountryDTO updateCountry(@Valid CountryDTO countryDTO) throws DataIntegrityViolationException {
         if (existsID(countryDTO.getId())) {
-            CountryDTO countryUpdated = null;
-
             nameToUpper(countryDTO);
 
             for (CityDTO cityDTO : countryDTO.getCityList()) {
@@ -111,14 +106,13 @@ public class CountryService {
             }
 
             try {
-                countryUpdated =  CountryAdapter.toDTO(countryRepository.save(CountryAdapter.fromDTO(countryDTO)));
+                return CountryAdapter.toDTO(countryRepository.save(CountryAdapter.fromDTO(countryDTO)));
             } catch (DataIntegrityViolationException exception) {
-
-                if (!isUniqueCountryName(countryDTO.getName())) {
+                if (!isNameUnique(countryDTO.getName())) {
                     throw new NameUniqueConstraintException(countryDTO);
                 }
 
-                if (!isUniquePhoneNumber(countryDTO.getPhoneNumber())) {
+                if (!isPhoneNumberUnique(countryDTO.getPhoneNumber())) {
                     throw new PhoneNumberUniqueConstraintException(countryDTO);
                 }
 
@@ -127,17 +121,16 @@ public class CountryService {
                         throw new NameUniqueConstraintException(cityDTO);
                     }
                 }
-            }
 
-            return countryUpdated;
+                throw new DataIntegrityViolationException(Objects.requireNonNull(exception.getMessage()));
+            }
         } else {
             throw new CountryNotFoundException(countryDTO.getId());
         }
     }
 
     @Validated(OnUpdate.class)
-    public CountryDTO patchCountry(@Valid CountryDTO countryDTO) {
-
+    public CountryDTO patchCountry(@Valid CountryDTO countryDTO) throws DataIntegrityViolationException {
         Optional<Country> countryFoundedById = countryRepository.findById(countryDTO.getId());
 
         if (countryFoundedById.isPresent()) {
@@ -149,7 +142,11 @@ public class CountryService {
                 try {
                     countryRepository.save(countryFoundedById.get());
                 } catch (DataIntegrityViolationException exception) {
-                    throw new NameUniqueConstraintException(countryDTO);
+                    if (!isNameUnique(countryDTO.getName())) {
+                        throw new NameUniqueConstraintException(countryDTO);
+                    }
+
+                    throw new DataIntegrityViolationException(Objects.requireNonNull(exception.getMessage()));
                 }
             }
 
@@ -159,7 +156,11 @@ public class CountryService {
                 try {
                     countryRepository.save(countryFoundedById.get());
                 } catch (DataIntegrityViolationException exception) {
-                    throw new PhoneNumberUniqueConstraintException(countryDTO);
+                    if (!isPhoneNumberUnique(countryDTO.getPhoneNumber())) {
+                        throw new PhoneNumberUniqueConstraintException(countryDTO);
+                    }
+
+                    throw new DataIntegrityViolationException(Objects.requireNonNull(exception.getMessage()));
                 }
             }
 
@@ -179,6 +180,8 @@ public class CountryService {
                             throw new NameUniqueConstraintException(cityDTO);
                         }
                     }
+
+                    throw new DataIntegrityViolationException(Objects.requireNonNull(exception.getMessage()));
                 }
             }
         } else {
@@ -189,8 +192,7 @@ public class CountryService {
     }
 
     @Validated(OnCreate.class)
-    public CountryDTO patchCountryAddCities(Integer id, @Valid List<CityDTO> cityDTOList) {
-
+    public CountryDTO patchCountryAddCities(Integer id, @Valid List<CityDTO> cityDTOList) throws DataIntegrityViolationException {
         Optional<Country> countryFoundedById = countryRepository.findById(id);
 
         if (countryFoundedById.isPresent()) {
@@ -207,6 +209,8 @@ public class CountryService {
                         throw new NameUniqueConstraintException(cityDTO);
                     }
                 }
+
+                throw new DataIntegrityViolationException(Objects.requireNonNull(exception.getMessage()));
             }
 
             return CountryAdapter.toDTO(countryFoundedById.get());
@@ -216,7 +220,6 @@ public class CountryService {
     }
 
     public CountryDTO deleteCountry(Integer id) {
-
         Optional<Country> countryFounded = countryRepository.findById(id);
 
         if (countryFounded.isPresent()) {
@@ -236,13 +239,13 @@ public class CountryService {
         return countryFoundedById.isPresent();
     }
 
-    private boolean isUniqueCountryName(String name) {
+    private boolean isNameUnique(String name) {
         Optional<Country> countryFounded = countryRepository.findByName(name);
 
         return !countryFounded.isPresent();
     }
 
-    private boolean isUniquePhoneNumber(String phoneNumber) {
+    private boolean isPhoneNumberUnique(String phoneNumber) {
         Optional<Country> countryFounded = countryRepository.findByPhoneNumber(phoneNumber);
 
         return !countryFounded.isPresent();
