@@ -1,9 +1,11 @@
 package com.rentacar.service.exceptions.car;
 
 import com.rentacar.model.CarDTO;
+import lombok.Getter;
 
 import java.util.Calendar;
 
+@Getter
 public class CarFirstRegistrationException extends RuntimeException{
     private String message = "Car first registration can not be ";
     private final String debugMessage;
@@ -24,14 +26,5 @@ public class CarFirstRegistrationException extends RuntimeException{
         } else if (firstRegistration < minYear) {
             message += "older than 10 years, year introduced: " + firstRegistration + ".";
         }
-    }
-
-    @Override
-    public String getMessage() {
-        return message;
-    }
-
-    public String getDebugMessage() {
-        return debugMessage;
     }
 }

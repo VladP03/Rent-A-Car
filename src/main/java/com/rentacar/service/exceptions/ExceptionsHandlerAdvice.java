@@ -6,6 +6,7 @@ import com.rentacar.service.exceptions.country.CountryNotFoundException;
 import com.rentacar.service.exceptions.dataIntegrity.NameUniqueConstraintException;
 import com.rentacar.service.exceptions.dataIntegrity.EmailUniqueConstraintException;
 import com.rentacar.service.exceptions.dataIntegrity.PhoneNumberUniqueConstraintException;
+import com.rentacar.service.exceptions.dataIntegrity.VinUniqueConstraintException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,8 @@ public class ExceptionsHandlerAdvice extends ResponseEntityExceptionHandler {
         return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), "");
     }
 
+    /* Unique Exceptions */
+
     @ExceptionHandler(EmailUniqueConstraintException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
@@ -56,41 +59,41 @@ public class ExceptionsHandlerAdvice extends ResponseEntityExceptionHandler {
         return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
     }
 
+    @ExceptionHandler(VinUniqueConstraintException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ApiError onVinUniqueConstraintException(VinUniqueConstraintException exception) {
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
+    }
+
 
     /* Country Expcetions */
 
     @ExceptionHandler(CountryNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     public ApiError onCountryNotFoundException(CountryNotFoundException exception) {
-        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
+        return new ApiError(HttpStatus.NOT_FOUND, exception.getMessage(), exception.getDebugMessage());
     }
 
 
     /* City Expcetions */
 
     @ExceptionHandler(CityNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     public ApiError onCityNotFoundException(CityNotFoundException exception) {
-        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
+        return new ApiError(HttpStatus.NOT_FOUND, exception.getMessage(), exception.getDebugMessage());
     }
 
 
     /* Car Expcetions */
 
     @ExceptionHandler(CarNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     public ApiError onCarNotFoundException(CarNotFoundException exception) {
-        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
-    }
-
-    @ExceptionHandler(CarAlreadyExistsException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public ApiError onCarAlreadyExistsException(CarAlreadyExistsException exception) {
-        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
+        return new ApiError(HttpStatus.NOT_FOUND, exception.getMessage(), exception.getDebugMessage());
     }
 
     @ExceptionHandler(CarFirstRegistrationException.class)

@@ -9,6 +9,8 @@ import com.rentacar.model.validations.OnUpdate;
 import com.rentacar.repository.car.Car;
 import com.rentacar.repository.car.CarRepository;
 import com.rentacar.service.exceptions.car.*;
+import com.rentacar.service.exceptions.dataIntegrity.VinUniqueConstraintException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
@@ -27,52 +29,140 @@ public class CarService {
         if (id == null && brandName == null) {
             return CarAdapter.toListDTO(carRepository.findAll());
         } else if (id != null && brandName != null) {
-            Optional<List<Car>> carFounded = carRepository.findByIDAndBrandName(id, brandName);
+
+            brandName = brandName.toUpperCase();
+            Optional<Car> carFounded = carRepository.findByIDAndBrandName(id, brandName);
 
             if (carFounded.isPresent()) {
-                return CarAdapter.toListDTO(carFounded.get());
+                return Collections.singletonList(CarAdapter.toDTO(carFounded.get()));
             } else {
-                throw  new CarNotFoundException(id, brandName);
+                throw new CarNotFoundException(id, brandName);
             }
-        }
-        else {
-            Optional<List<Car>> carFounded = carRepository.findByIDOrBrandName(id, brandName);
+        } else if (brandName != null) {
 
-            if (carFounded.isPresent()) {
-                return CarAdapter.toListDTO(carFounded.get());
-            } else if (brandName == null){
-                throw new CarNotFoundException(id);
+            brandName = brandName.toUpperCase();
+            Optional<List<Car>> carsFounded = carRepository.findByBrandName(brandName);
+
+            if (carsFounded.isPresent()) {
+                return CarAdapter.toListDTO(carsFounded.get());
             } else {
                 throw new CarNotFoundException(brandName);
             }
+        } else {
+
+            Optional<Car> carFounded = carRepository.findById(id);
+
+            if (carFounded.isPresent()) {
+                return Collections.singletonList(CarAdapter.toDTO(carFounded.get()));
+            } else {
+                throw new CarNotFoundException(id);
+            }
         }
-    }
-
-    @Validated(OnCreate.class)
-    public CarDTO createCarAdmin(@Valid CarDTO carDTO) {
-        namesToUpper(carDTO);
-
-        checkIfCarAlreadyExists(carDTO);
-        checkFirstRegistration(carDTO);
-        checkFuel(carDTO);
-        checkGearbox(carDTO);
-
-        return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carDTO)));
     }
 
     @Validated(OnCreate.class)
     public void createCar(@Valid CarDTO carDTO) {
         namesToUpper(carDTO);
 
-        checkIfCarAlreadyExists(carDTO);
+        checkFirstRegistration(carDTO);
+        checkFuel(carDTO);
+        checkGearbox(carDTO);
+    }
+
+    @Validated(OnUpdate.class)
+    public void updateCar(@Valid CarDTO carDTO) {
+        Optional<Car> carFounded = carRepository.findById(carDTO.getID());
+
+        if (carFounded.isPresent()) {
+            namesToUpper(carDTO);
+
+            checkFirstRegistration(carDTO);
+            checkFuel(carDTO);
+            checkGearbox(carDTO);
+        } else {
+            throw new CarNotFoundException(carDTO.getID());
+        }
+    }
+
+    @Validated(OnUpdate.class)
+    public void patchCar(CarDTO carDTO) {
+        Optional<Car> carFounded = carRepository.findById(carDTO.getID());
+
+        if (carFounded.isPresent()) {
+
+            if (carDTO.getBrandName() != null) {
+                carFounded.get().setBrandName(carDTO.getBrandName());
+            }
+
+            if (carDTO.getName() != null) {
+                carFounded.get().setName(carDTO.getName());
+            }
+
+            if (carDTO.getVIN() != null) {
+                carFounded.get().setVIN(carDTO.getVIN());
+            }
+
+            if (carDTO.getFirstRegistration() != null) {
+                checkFirstRegistration(carDTO);
+                carFounded.get().setFirstRegistration(carDTO.getFirstRegistration());
+            }
+
+            if (carDTO.getEngineCapacity() != null) {
+                carFounded.get().setEngineCapacity(carDTO.getEngineCapacity());
+            }
+
+            if (carDTO.getFuel() != null) {
+                checkFuel(carDTO);
+                carFounded.get().setFuel(carDTO.getFuel());
+            }
+
+            if (carDTO.getGearbox() != null) {
+                checkGearbox(carDTO);
+                carFounded.get().setGearbox(carDTO.getGearbox());
+            }
+
+            CarDTO finalCar = CarAdapter.toDTO(carFounded.get());
+
+            namesToUpper(finalCar);
+        } else {
+            throw new CarNotFoundException(carDTO.getID());
+        }
+    }
+
+    public void deleteCar(Integer id) {
+        Optional<Car> carFounded = carRepository.findById(id);
+
+        if (!carFounded.isPresent()) {
+            throw new CarNotFoundException(id);
+        }
+    }
+
+
+    // Admin
+
+    @Validated(OnCreate.class)
+    public CarDTO createCarAdmin(@Valid CarDTO carDTO) {
+        CarDTO carCreated = null;
+
+        namesToUpper(carDTO);
+
         checkFirstRegistration(carDTO);
         checkFuel(carDTO);
         checkGearbox(carDTO);
 
+        try {
+            carCreated = CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carDTO)));
+        } catch (DataIntegrityViolationException exception) {
+            if (!isUniqueVIN(carDTO.getVIN())) {
+                throw new VinUniqueConstraintException(carDTO);
+            }
+        }
+
+        return carCreated;
     }
 
     @Validated(OnUpdate.class)
-    public CarDTO updateCar(@Valid CarDTO carDTO) {
+    public CarDTO updateCarAdmin(@Valid CarDTO carDTO) {
         Optional<Car> carFounded = carRepository.findById(carDTO.getID());
 
         if (carFounded.isPresent()) {
@@ -82,7 +172,13 @@ public class CarService {
             checkFuel(carDTO);
             checkGearbox(carDTO);
 
-            carRepository.save(CarAdapter.fromDTO(carDTO));
+            try {
+                carRepository.save(CarAdapter.fromDTO(carDTO));
+            } catch (DataIntegrityViolationException exception) {
+                if (!isUniqueVIN(carDTO.getVIN())) {
+                    throw new VinUniqueConstraintException(carDTO);
+                }
+            }
 
             return carDTO;
         } else {
@@ -91,7 +187,7 @@ public class CarService {
     }
 
     @Validated(OnUpdate.class)
-    public CarDTO patchCar(CarDTO carDTO) {
+    public CarDTO patchCarAdmin(CarDTO carDTO) {
         Optional<Car> carFounded = carRepository.findById(carDTO.getID());
 
         if (carFounded.isPresent()) {
@@ -129,7 +225,14 @@ public class CarService {
 
             CarDTO finalCar = CarAdapter.toDTO(carFounded.get());
             namesToUpper(finalCar);
-            carRepository.save(CarAdapter.fromDTO(finalCar));
+
+            try {
+                carRepository.save(CarAdapter.fromDTO(finalCar));
+            } catch (DataIntegrityViolationException exception) {
+                if (!isUniqueVIN(carDTO.getVIN())) {
+                    throw new VinUniqueConstraintException(carDTO);
+                }
+            }
 
             return finalCar;
         } else {
@@ -137,7 +240,7 @@ public class CarService {
         }
     }
 
-    public CarDTO deleteCar(Integer id) {
+    public CarDTO deleteCarAdmin(Integer id) {
         Optional<Car> carFounded = carRepository.findById(id);
 
         if (carFounded.isPresent()) {
@@ -151,11 +254,13 @@ public class CarService {
 
 
 
-    private void checkIfCarAlreadyExists(CarDTO carDTO) {
-        if (carRepository.findByVIN(carDTO.getVIN()).isPresent()) {
-            throw new CarAlreadyExistsException(carDTO);
-        }
+    private boolean isUniqueVIN(String VIN) {
+        Optional<Car> carFounded = carRepository.findByVIN(VIN);
+
+        return !carFounded.isPresent();
     }
+
+
 
     private void checkFirstRegistration(CarDTO carDTO) {
         if (carDTO.getFirstRegistration() > Calendar.getInstance().get(Calendar.YEAR)) {

@@ -1,6 +1,8 @@
 package com.rentacar.service.exceptions.car;
 
+import lombok.Getter;
 
+@Getter
 public class CarNotFoundException extends RuntimeException{
     private String message = "Car not found.";
     private final String debugMessage;
@@ -18,15 +20,5 @@ public class CarNotFoundException extends RuntimeException{
     public CarNotFoundException(Integer id, String brandName) {
         message += " In database does not exists an car with id " + id + " and brand name " + brandName + ".";
         debugMessage = "No car in database with that ID and brand name";
-    }
-
-
-    @Override
-    public String getMessage() {
-        return message;
-    }
-
-    public String getDebugMessage() {
-        return debugMessage;
     }
 }

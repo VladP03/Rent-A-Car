@@ -1,7 +1,9 @@
 package com.rentacar.service.exceptions.car;
 
 import com.rentacar.model.CarDTO;
+import lombok.Getter;
 
+@Getter
 public class CarGearboxException extends RuntimeException{
     private String message = "Car gearbox is incorrect.";
     private final String debugMessage;
@@ -11,14 +13,5 @@ public class CarGearboxException extends RuntimeException{
         message += " Error on the following car: " + carDTO.getBrandName() + " " + carDTO.getName() + ", with VIN: " + carDTO.getVIN() + ".";
 
         debugMessage = "Car gearbox might be only: manual or automatic";
-    }
-
-    @Override
-    public String getMessage() {
-        return message;
-    }
-
-    public String getDebugMessage() {
-        return debugMessage;
     }
 }

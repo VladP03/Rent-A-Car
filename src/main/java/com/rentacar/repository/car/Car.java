@@ -14,9 +14,11 @@ public class Car {
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CarSeq")
     private Integer ID;
 
+    @Column(unique = true)
+    private String VIN;
+
     private String brandName;
     private String name;
-    private String VIN;
     private Integer firstRegistration;
     private Integer engineCapacity;
     private String fuel;
