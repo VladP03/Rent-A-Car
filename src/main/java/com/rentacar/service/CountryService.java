@@ -136,7 +136,7 @@ public class CountryService {
     }
 
     @Validated(OnUpdate.class)
-    public CountryDTO patchCountry(CountryDTO countryDTO) {
+    public CountryDTO patchCountry(@Valid CountryDTO countryDTO) {
 
         Optional<Country> countryFoundedById = countryRepository.findById(countryDTO.getId());
 
@@ -189,7 +189,7 @@ public class CountryService {
     }
 
     @Validated(OnCreate.class)
-    public CountryDTO patchCountryAddCities(Integer id, List<CityDTO> cityDTOList) {
+    public CountryDTO patchCountryAddCities(Integer id, @Valid List<CityDTO> cityDTOList) {
 
         Optional<Country> countryFoundedById = countryRepository.findById(id);
 
