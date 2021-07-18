@@ -28,4 +28,19 @@ public class DealershipController {
     private ResponseEntity<DealershipDTO> createDealership(@Valid @RequestBody DealershipDTO dealershipDTO) {
         return ResponseEntity.ok(dealershipService.createDealership(dealershipDTO));
     }
+
+    @PutMapping
+    private ResponseEntity<DealershipDTO> updateDealership(@Valid @RequestBody DealershipDTO dealershipDTO) {
+        return ResponseEntity.ok(dealershipService.updateDealership(dealershipDTO));
+    }
+
+    @PatchMapping
+    private ResponseEntity<DealershipDTO> patchDealership(@RequestBody DealershipDTO dealershipDTO) {
+        return ResponseEntity.ok(dealershipService.patchDealership(dealershipDTO));
+    }
+
+    @DeleteMapping("/{id}")
+    private ResponseEntity<DealershipDTO> deleteDealership(@PathVariable Integer id) {
+        return ResponseEntity.ok(dealershipService.deleteDealership(id));
+    }
 }

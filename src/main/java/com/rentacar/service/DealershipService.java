@@ -5,14 +5,19 @@ import java.util.*;
 import com.rentacar.model.CarDTO;
 import com.rentacar.model.CityDTO;
 import com.rentacar.model.DealershipDTO;
+import com.rentacar.model.adapters.CarAdapter;
+import com.rentacar.model.adapters.CityAdapter;
+import com.rentacar.model.adapters.CountryAdapter;
 import com.rentacar.model.adapters.DealershipAdapter;
 import com.rentacar.model.validations.OnCreate;
+import com.rentacar.model.validations.OnUpdate;
 import com.rentacar.repository.dealership.Dealership;
 import com.rentacar.repository.dealership.DealershipRepository;
 import com.rentacar.service.exceptions.city.CityNotFoundException;
 import com.rentacar.service.exceptions.country.CountryNotFoundException;
 import com.rentacar.service.exceptions.dataIntegrity.EmailUniqueConstraintException;
 import com.rentacar.service.exceptions.dataIntegrity.PhoneNumberUniqueConstraintException;
+import com.rentacar.service.exceptions.dataIntegrity.VinUniqueConstraintException;
 import com.rentacar.service.exceptions.dealership.DealershipCityInvalidException;
 import com.rentacar.service.exceptions.dealership.DealershipNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -26,9 +31,12 @@ import javax.validation.Valid;
 public class DealershipService {
 
     private final DealershipRepository dealershipRepository;
+
     private final CarService carService;
     private final CountryService countryService;
     private final CityService cityService;
+
+
 
     public DealershipService(DealershipRepository dealershipRepository, CarService carService, CountryService countryService, CityService cityService) {
         this.dealershipRepository = dealershipRepository;
@@ -36,6 +44,8 @@ public class DealershipService {
         this.countryService = countryService;
         this.cityService = cityService;
     }
+
+
 
     public List<DealershipDTO> getDealership(Integer id, String name) {
         if (id == null && name == null) {
@@ -62,7 +72,7 @@ public class DealershipService {
     }
 
     @Validated(OnCreate.class)
-    public DealershipDTO createDealership(@Valid DealershipDTO dealershipDTO) throws DataIntegrityViolationException {
+    public DealershipDTO createDealership(@Valid DealershipDTO dealershipDTO) {
         if (countryService.getCountry(dealershipDTO.getCountry().getId(), dealershipDTO.getCountry().getName()) != null) {
             if (cityService.getCity(dealershipDTO.getCity().getId(), dealershipDTO.getCity().getName()) != null) {
                 namesToUpper(dealershipDTO);
@@ -71,11 +81,11 @@ public class DealershipService {
                     throw new DealershipCityInvalidException(dealershipDTO);
                 }
 
-                for (CarDTO carDTO : dealershipDTO.getCars()) {
-                    carService.createCar(carDTO);
+                if (dealershipDTO.getCars() != null) {
+                    createCar(dealershipDTO.getCars());
                 }
 
-                rewritePhoneNumber(dealershipDTO);
+                dealershipDTO.setPhoneNumber(rewritePhoneNumber(dealershipDTO.getPhoneNumber(), dealershipDTO.getCountry().getPhoneNumber()));
 
                 try {
                     return DealershipAdapter.toDTO(dealershipRepository.save(DealershipAdapter.fromDTO(dealershipDTO)));
@@ -95,6 +105,148 @@ public class DealershipService {
             }
         } else {
             throw new CountryNotFoundException(dealershipDTO.getCountry().getId(), dealershipDTO.getCountry().getName());
+        }
+    }
+
+    @Validated(OnUpdate.class)
+    public DealershipDTO updateDealership(@Valid DealershipDTO dealershipDTO) {
+        if (existsDealership(dealershipDTO.getID())) {
+            if (countryService.getCountry(dealershipDTO.getCountry().getId(), dealershipDTO.getCountry().getName()) != null) {
+                if (cityService.getCity(dealershipDTO.getCity().getId(), dealershipDTO.getCity().getName()) != null) {
+                    namesToUpper(dealershipDTO);
+
+                    if (!isCityInCountryCitiesList(dealershipDTO)) {
+                        throw new DealershipCityInvalidException(dealershipDTO);
+                    }
+
+                    if (dealershipDTO.getCars() != null) {
+                        createCar(dealershipDTO.getCars());
+                    }
+
+                    dealershipDTO.setPhoneNumber(rewritePhoneNumber(dealershipDTO.getPhoneNumber(), dealershipDTO.getCountry().getPhoneNumber()));
+
+                    try {
+                        return DealershipAdapter.toDTO(dealershipRepository.save(DealershipAdapter.fromDTO(dealershipDTO)));
+                    } catch (DataIntegrityViolationException exception) {
+                        if (!isUniqueEmail(dealershipDTO.getEmail())) {
+                            throw new EmailUniqueConstraintException(dealershipDTO);
+                        }
+
+                        if (!isUniquePhoneNumber(dealershipDTO.getPhoneNumber())) {
+                            throw new PhoneNumberUniqueConstraintException(dealershipDTO);
+                        }
+
+                        throw new DataIntegrityViolationException(Objects.requireNonNull(exception.getMessage()));
+                    }
+                } else {
+                    throw new CityNotFoundException(dealershipDTO.getCity().getId(), dealershipDTO.getCity().getName());
+                }
+            } else {
+                throw new CountryNotFoundException(dealershipDTO.getCountry().getId(), dealershipDTO.getCountry().getName());
+            }
+        } else {
+            throw new DealershipNotFoundException(dealershipDTO.getID());
+        }
+    }
+
+    @Validated(OnUpdate.class)
+    public DealershipDTO patchDealership(@Valid DealershipDTO dealershipDTO) {
+        Optional<Dealership> dealershipFounded = dealershipRepository.findById(dealershipDTO.getID());
+
+        if (dealershipFounded.isPresent()) {
+
+            if (dealershipDTO.getName() != null) {
+                dealershipFounded.get().setName(dealershipDTO.getName().toUpperCase());
+
+                dealershipRepository.save(dealershipFounded.get());
+            }
+
+            if (dealershipDTO.getCountry() != null) {
+                if (countryService.getCountry(dealershipDTO.getCountry().getId(), dealershipDTO.getCountry().getName()) != null) {
+                    dealershipFounded.get().setCountry(CountryAdapter.fromDTO(dealershipDTO.getCountry()));
+
+                    dealershipRepository.save(dealershipFounded.get());
+                } else {
+                    throw new CountryNotFoundException(dealershipDTO.getCountry().getId(), dealershipDTO.getCountry().getName());
+                }
+            }
+
+            if (dealershipDTO.getCity() != null) {
+                if (cityService.getCity(dealershipDTO.getCity().getId(), dealershipDTO.getCity().getName()) != null) {
+                    if (!isCityInCountryCitiesList(dealershipDTO)) {
+                        throw new DealershipCityInvalidException(dealershipDTO);
+                    }
+
+                    dealershipFounded.get().setCity(CityAdapter.fromDTO(dealershipDTO.getCity()));
+
+                    dealershipRepository.save(DealershipAdapter.fromDTO(dealershipDTO));
+                } else {
+                    throw new CityNotFoundException(dealershipDTO.getCity().getId(), dealershipDTO.getCity().getName());
+                }
+            }
+
+            if (dealershipDTO.getEmail() != null) {
+                dealershipFounded.get().setEmail(dealershipDTO.getEmail());
+
+                try {
+                    dealershipRepository.save(DealershipAdapter.fromDTO(dealershipDTO));
+                } catch (DataIntegrityViolationException exception) {
+                    if (!isUniqueEmail(dealershipDTO.getEmail())) {
+                        throw new EmailUniqueConstraintException(dealershipDTO);
+                    }
+
+                    throw new DataIntegrityViolationException(Objects.requireNonNull(exception.getMessage()));
+                }
+            }
+
+            if (dealershipDTO.getPhoneNumber() != null) {
+                dealershipFounded.get().setPhoneNumber(rewritePhoneNumber(dealershipDTO.getPhoneNumber(), dealershipDTO.getCountry().getPhoneNumber()));
+
+                try {
+                    dealershipRepository.save(DealershipAdapter.fromDTO(dealershipDTO));
+                } catch (DataIntegrityViolationException exception) {
+                    if (!isUniquePhoneNumber(dealershipDTO.getEmail())) {
+                        throw new PhoneNumberUniqueConstraintException(dealershipDTO);
+                    }
+
+                    throw new DataIntegrityViolationException(Objects.requireNonNull(exception.getMessage()));
+                }
+            }
+
+            if (dealershipDTO.getCars() != null) {
+                createCar(dealershipDTO.getCars());
+
+                dealershipFounded.get().getCars().clear();
+                dealershipFounded.get().getCars().addAll(CarAdapter.fromListDTO(dealershipDTO.getCars()));
+
+                try {
+                    dealershipRepository.save(DealershipAdapter.fromDTO(dealershipDTO));
+                } catch (DataIntegrityViolationException exception) {
+                    for (CarDTO carDTO : dealershipDTO.getCars()) {
+                        if (!carService.isUniqueVIN(carDTO.getVIN())) {
+                            throw new VinUniqueConstraintException(carDTO);
+                        }
+                    }
+
+                    throw new DataIntegrityViolationException(Objects.requireNonNull(exception.getMessage()));
+                }
+            }
+
+            return DealershipAdapter.toDTO(dealershipFounded.get());
+        } else {
+            throw new DealershipNotFoundException(dealershipDTO.getID());
+        }
+    }
+
+    public DealershipDTO deleteDealership(Integer id) {
+        Optional<Dealership> dealershipFounded = dealershipRepository.findById(id);
+
+        if (dealershipFounded.isPresent()) {
+            dealershipRepository.deleteById(id);
+
+            return DealershipAdapter.toDTO(dealershipFounded.get());
+        } else {
+            throw new DealershipNotFoundException(id);
         }
     }
 
@@ -123,15 +275,23 @@ public class DealershipService {
         return false;
     }
 
-    private void rewritePhoneNumber (DealershipDTO dealershipDTO) {
-        String dealerNumber = dealershipDTO.getPhoneNumber();
-        String countryNumber = dealershipDTO.getCountry().getPhoneNumber();
+    private boolean existsDealership(Integer id) {
+        Optional<Dealership> dealershipFounded = dealershipRepository.findById(id);
 
-        String dealerNumberVisible = dealerNumber.substring(0,3) + "-" + dealerNumber.substring(3, 7) + "-" + dealerNumber.substring(7);
-
-        dealershipDTO.setPhoneNumber(countryNumber + " " + dealerNumberVisible);
+        return dealershipFounded.isPresent();
     }
 
+    private String rewritePhoneNumber (String dealerNumber, String countryNumber) {
+        String dealerNumberVisible = dealerNumber.substring(0,3) + "-" + dealerNumber.substring(3, 7) + "-" + dealerNumber.substring(7);
+
+        return countryNumber + " " + dealerNumberVisible;
+    }
+
+    private void createCar(List<CarDTO> carDTOList) {
+        for (CarDTO carDTO : carDTOList) {
+            carService.createCar(carDTO);
+        }
+    }
 
 
     private void namesToUpper(DealershipDTO dealershipDTO) {
