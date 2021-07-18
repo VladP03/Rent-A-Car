@@ -21,9 +21,13 @@ public class CarService {
 
     private final CarRepository carRepository;
 
+
+
     public CarService(CarRepository carRepository) {
         this.carRepository = carRepository;
     }
+
+
 
     public List<CarDTO> getCar(Integer id, String brandName) {
         if (id == null && brandName == null) {
@@ -142,8 +146,6 @@ public class CarService {
 
     @Validated(OnCreate.class)
     public CarDTO createCarAdmin(@Valid CarDTO carDTO) {
-        CarDTO carCreated = null;
-
         namesToUpper(carDTO);
 
         checkFirstRegistration(carDTO);
@@ -151,14 +153,14 @@ public class CarService {
         checkGearbox(carDTO);
 
         try {
-            carCreated = CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carDTO)));
+            return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carDTO)));
         } catch (DataIntegrityViolationException exception) {
             if (!isUniqueVIN(carDTO.getVIN())) {
                 throw new VinUniqueConstraintException(carDTO);
             }
-        }
 
-        return carCreated;
+            throw new DataIntegrityViolationException(Objects.requireNonNull(exception.getMessage()));
+        }
     }
 
     @Validated(OnUpdate.class)
@@ -178,6 +180,8 @@ public class CarService {
                 if (!isUniqueVIN(carDTO.getVIN())) {
                     throw new VinUniqueConstraintException(carDTO);
                 }
+
+                throw new DataIntegrityViolationException(Objects.requireNonNull(exception.getMessage()));
             }
 
             return carDTO;
@@ -227,14 +231,14 @@ public class CarService {
             namesToUpper(finalCar);
 
             try {
-                carRepository.save(CarAdapter.fromDTO(finalCar));
+                return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(finalCar)));
             } catch (DataIntegrityViolationException exception) {
                 if (!isUniqueVIN(carDTO.getVIN())) {
                     throw new VinUniqueConstraintException(carDTO);
                 }
-            }
 
-            return finalCar;
+                throw new DataIntegrityViolationException(Objects.requireNonNull(exception.getMessage()));
+            }
         } else {
             throw new CarNotFoundException(carDTO.getID());
         }
@@ -254,7 +258,7 @@ public class CarService {
 
 
 
-    private boolean isUniqueVIN(String VIN) {
+    protected boolean isUniqueVIN(String VIN) {
         Optional<Car> carFounded = carRepository.findByVIN(VIN);
 
         return !carFounded.isPresent();

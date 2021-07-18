@@ -68,7 +68,7 @@ public class CountryService {
     }
 
     @Validated(OnCreate.class)
-    public CountryDTO createCountry(@Valid CountryDTO countryDTO) throws DataIntegrityViolationException {
+    public CountryDTO createCountry(@Valid CountryDTO countryDTO) {
         nameToUpper(countryDTO);
 
         for (CityDTO cityDTO : countryDTO.getCityList()) {
@@ -97,7 +97,7 @@ public class CountryService {
     }
 
     @Validated(OnUpdate.class)
-    public CountryDTO updateCountry(@Valid CountryDTO countryDTO) throws DataIntegrityViolationException {
+    public CountryDTO updateCountry(@Valid CountryDTO countryDTO) {
         if (existsID(countryDTO.getId())) {
             nameToUpper(countryDTO);
 
@@ -130,7 +130,7 @@ public class CountryService {
     }
 
     @Validated(OnUpdate.class)
-    public CountryDTO patchCountry(@Valid CountryDTO countryDTO) throws DataIntegrityViolationException {
+    public CountryDTO patchCountry(@Valid CountryDTO countryDTO) {
         Optional<Country> countryFoundedById = countryRepository.findById(countryDTO.getId());
 
         if (countryFoundedById.isPresent()) {
@@ -192,7 +192,7 @@ public class CountryService {
     }
 
     @Validated(OnCreate.class)
-    public CountryDTO patchCountryAddCities(Integer id, @Valid List<CityDTO> cityDTOList) throws DataIntegrityViolationException {
+    public CountryDTO patchCountryAddCities(Integer id, @Valid List<CityDTO> cityDTOList) {
         Optional<Country> countryFoundedById = countryRepository.findById(id);
 
         if (countryFoundedById.isPresent()) {

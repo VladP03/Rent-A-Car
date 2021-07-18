@@ -86,7 +86,7 @@ public class CityService {
     // Admin
 
     @Validated(OnCreate.class)
-    public CityDTO createCityAdmin(@Valid CityDTO cityDTO) throws DataIntegrityViolationException {
+    public CityDTO createCityAdmin(@Valid CityDTO cityDTO) {
         nameToUpper(cityDTO);
 
         try {
@@ -101,7 +101,7 @@ public class CityService {
     }
 
     @Validated(OnUpdate.class)
-    public CityDTO updateCityAdmin(@Valid CityDTO cityDTO) throws DataIntegrityViolationException {
+    public CityDTO updateCityAdmin(@Valid CityDTO cityDTO) {
         if (existsCityById(cityDTO.getId())) {
             nameToUpper(cityDTO);
 
