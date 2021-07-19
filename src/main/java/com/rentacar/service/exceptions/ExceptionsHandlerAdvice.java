@@ -9,6 +9,8 @@ import com.rentacar.service.exceptions.dataIntegrity.PhoneNumberUniqueConstraint
 import com.rentacar.service.exceptions.dataIntegrity.VinUniqueConstraintException;
 import com.rentacar.service.exceptions.dealership.DealershipCityInvalidException;
 import com.rentacar.service.exceptions.dealership.DealershipNotFoundException;
+import com.rentacar.service.exceptions.rent.RentCarIndisponible;
+import com.rentacar.service.exceptions.rent.RentDateInvalidException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,6 +67,23 @@ public class ExceptionsHandlerAdvice extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ApiError onVinUniqueConstraintException(VinUniqueConstraintException exception) {
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
+    }
+
+
+    /* Rent Exceptions */
+
+    @ExceptionHandler(RentDateInvalidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ApiError onRentDateInvalidException(RentDateInvalidException exception) {
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
+    }
+
+    @ExceptionHandler(RentCarIndisponible.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ApiError onRentCarIndisponible(RentCarIndisponible exception) {
         return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
     }
 

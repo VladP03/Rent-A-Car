@@ -6,12 +6,10 @@ import com.rentacar.model.validations.OnUpdate;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
-import java.util.Date;
 
 @Builder
 @Getter @Setter
