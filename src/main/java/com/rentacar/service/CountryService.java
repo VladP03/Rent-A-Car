@@ -75,6 +75,8 @@ public class CountryService {
             for (CityDTO cityDTO : countryDTO.getCityList()) {
                 cityService.createCity(cityDTO);
             }
+        } else {
+            countryDTO.setCityList(Collections.emptyList());
         }
 
         try {
@@ -103,8 +105,12 @@ public class CountryService {
         if (existsID(countryDTO.getId())) {
             nameToUpper(countryDTO);
 
-            for (CityDTO cityDTO : countryDTO.getCityList()) {
-                cityService.createCity(cityDTO);
+            if (countryDTO.getCityList() != null) {
+                for (CityDTO cityDTO : countryDTO.getCityList()) {
+                    cityService.createCity(cityDTO);
+                }
+            } else {
+                countryDTO.setCityList(Collections.emptyList());
             }
 
             try {

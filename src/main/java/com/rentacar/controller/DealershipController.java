@@ -39,6 +39,11 @@ public class DealershipController {
         return ResponseEntity.ok(dealershipService.patchDealership(dealershipDTO));
     }
 
+    @PatchMapping("/{id}")
+    private ResponseEntity<DealershipDTO> patchDealershipAddCars(@PathVariable Integer id, @RequestBody List<CarDTO> carList) {
+        return ResponseEntity.ok(dealershipService.patchDealershipAddCars(id, carList));
+    }
+
     @DeleteMapping("/{id}")
     private ResponseEntity<DealershipDTO> deleteDealership(@PathVariable Integer id) {
         return ResponseEntity.ok(dealershipService.deleteDealership(id));

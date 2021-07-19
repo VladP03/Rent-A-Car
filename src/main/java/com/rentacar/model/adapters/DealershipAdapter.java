@@ -4,47 +4,32 @@ import com.rentacar.model.DealershipDTO;
 import com.rentacar.repository.dealership.Dealership;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class DealershipAdapter {
 
     public static DealershipDTO toDTO(Dealership dealership) {
-        DealershipDTO dealershipDTO = DealershipDTO.builder()
+        return DealershipDTO.builder()
                 .ID(dealership.getID())
                 .name(dealership.getName())
                 .city(CityAdapter.toDTO(dealership.getCity()))
                 .country(CountryAdapter.toDTO(dealership.getCountry()))
                 .email(dealership.getEmail())
                 .phoneNumber(dealership.getPhoneNumber())
+                .cars(CarAdapter.toListDTO(dealership.getCars()))
                 .build();
-
-        if (dealership.getCars() != null) {
-            dealershipDTO.setCars(CarAdapter.toListDTO(dealership.getCars()));
-        } else {
-            dealershipDTO.setCars(Collections.emptyList());
-        }
-
-        return dealershipDTO;
     }
 
     public static Dealership fromDTO (DealershipDTO dealershipDTO) {
-        Dealership dealership = Dealership.builder()
+        return Dealership.builder()
                 .ID(dealershipDTO.getID())
                 .name(dealershipDTO.getName())
                 .city(CityAdapter.fromDTO(dealershipDTO.getCity()))
                 .country(CountryAdapter.fromDTO(dealershipDTO.getCountry()))
                 .email(dealershipDTO.getEmail())
                 .phoneNumber(dealershipDTO.getPhoneNumber())
+                .cars(CarAdapter.fromListDTO(dealershipDTO.getCars()))
                 .build();
-
-        if (dealershipDTO.getCars() != null) {
-            dealership.setCars(CarAdapter.fromListDTO(dealershipDTO.getCars()));
-        } else {
-            dealership.setCars(Collections.emptyList());
-        }
-
-        return dealership;
     }
 
     public static List<DealershipDTO> toListDTO (List<Dealership> dealershipList) {

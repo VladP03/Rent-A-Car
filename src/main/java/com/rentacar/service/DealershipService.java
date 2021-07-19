@@ -83,6 +83,8 @@ public class DealershipService {
 
                 if (dealershipDTO.getCars() != null) {
                     createCar(dealershipDTO.getCars());
+                } else {
+                    dealershipDTO.setCars(Collections.emptyList());
                 }
 
                 dealershipDTO.setPhoneNumber(rewritePhoneNumber(dealershipDTO.getPhoneNumber(), dealershipDTO.getCountry().getPhoneNumber()));
@@ -121,6 +123,8 @@ public class DealershipService {
 
                     if (dealershipDTO.getCars() != null) {
                         createCar(dealershipDTO.getCars());
+                    } else {
+                        dealershipDTO.setCars(Collections.emptyList());
                     }
 
                     dealershipDTO.setPhoneNumber(rewritePhoneNumber(dealershipDTO.getPhoneNumber(), dealershipDTO.getCountry().getPhoneNumber()));
@@ -235,6 +239,34 @@ public class DealershipService {
             return DealershipAdapter.toDTO(dealershipFounded.get());
         } else {
             throw new DealershipNotFoundException(dealershipDTO.getID());
+        }
+    }
+
+    public DealershipDTO patchDealershipAddCars(Integer id, List<CarDTO> carList) {
+        Optional<Dealership> dealershipFounded = dealershipRepository.findById(id);
+
+        if (dealershipFounded.isPresent()) {
+            if (carList != null) {
+                createCar(carList);
+
+                dealershipFounded.get().getCars().addAll(CarAdapter.fromListDTO(carList));
+
+                try {
+                    dealershipRepository.save(dealershipFounded.get());
+                } catch (DataIntegrityViolationException exception) {
+                    for (CarDTO carDTO : carList) {
+                        if (!carService.isUniqueVIN(carDTO.getVIN())) {
+                            throw new VinUniqueConstraintException(carDTO);
+                        }
+                    }
+
+                    throw new DataIntegrityViolationException(Objects.requireNonNull(exception.getMessage()));
+                }
+            }
+
+            return DealershipAdapter.toDTO(dealershipFounded.get());
+        } else {
+            throw new DealershipNotFoundException(id);
         }
     }
 
