@@ -1,5 +1,6 @@
 package com.rentacar.service;
 
+import com.rentacar.model.CarDTO;
 import com.rentacar.model.DealershipDTO;
 import com.rentacar.model.RentDTO;
 import com.rentacar.model.adapters.CarAdapter;
@@ -47,17 +48,10 @@ public class RentService {
         DealershipDTO dealershipFounded = dealershipService.getDealership(dealershipId);
 
         if (dealershipFounded != null) {
-            if (!checkDate(rentDTO.getStartDate(), rentDTO.getEndDate())) {
-                throw new RentDateInvalidException(rentDTO.getStartDate(), rentDTO.getEndDate());
-            }
-
-            if (!dealershipFounded.getCars().contains(rentDTO.getCar())) {
-                throw new CarNotFoundException(rentDTO);
-            }
-
-            if (!checkIfCarIsDisponible(rentDTO)) {
-                throw new RentCarIndisponibleException(rentDTO);
-            }
+            checkDateStartBeforeEnd(rentDTO.getStartDate(), rentDTO.getEndDate());
+            checkDateProperEnd(rentDTO.getEndDate());
+            checkIfDealershipHaveCar(dealershipFounded, rentDTO);
+            checkIfCarIsDisponible(rentDTO);
 
             return RentAdapter.toDTO(rentRepository.save(RentAdapter.fromDTO(rentDTO)));
 
@@ -71,18 +65,10 @@ public class RentService {
         Optional<Rent> rentFounded = rentRepository.findById(rentDTO.getID());
 
         if (rentFounded.isPresent()) {
-            if (!checkDate(rentDTO.getStartDate(), rentDTO.getEndDate())) {
-                throw new RentDateInvalidException(rentDTO.getStartDate(), rentDTO.getEndDate());
-            }
-
-            DealershipDTO dealershipFounded = dealershipService.getDealership(rentDTO.getCar());
-            if (!dealershipFounded.getCars().contains(rentDTO.getCar())) {
-                throw new CarNotFoundException(rentDTO);
-            }
-
-            if (!checkIfCarIsDisponible(rentDTO)) {
-                throw new RentCarIndisponibleException(rentDTO);
-            }
+            checkDateStartBeforeEnd(rentDTO.getStartDate(), rentDTO.getEndDate());
+            checkDateProperEnd(rentDTO.getEndDate());
+            checkIfDealershipHaveCar(RentAdapter.toDTO(rentFounded.get()), rentDTO);
+            checkIfCarIsDisponible(rentDTO);
 
             return RentAdapter.toDTO(rentRepository.save(RentAdapter.fromDTO(rentDTO)));
         } else {
@@ -97,40 +83,31 @@ public class RentService {
         if (rentFounded.isPresent()) {
 
             if (rentDTO.getCar() != null) {
-                DealershipDTO dealershipFounded = dealershipService.getDealership(rentDTO.getCar());
-                if (!dealershipFounded.getCars().contains(rentDTO.getCar())) {
-                    throw new CarNotFoundException(rentDTO);
-                }
-
-                if (!checkIfCarIsDisponible(rentDTO)) {
-                    throw new RentCarIndisponibleException(rentDTO);
-                }
+                checkIfDealershipHaveCar(RentAdapter.toDTO(rentFounded.get()), rentDTO);
+                checkIfCarIsDisponible(rentDTO);
 
                 rentFounded.get().setCar(CarAdapter.fromDTO(rentDTO.getCar()));
                 rentRepository.save(rentFounded.get());
             }
 
             if (rentDTO.getStartDate() != null && rentDTO.getEndDate() != null) {
-                if (!checkDate(rentDTO.getStartDate(), rentDTO.getEndDate())) {
-                    throw new RentDateInvalidException(rentDTO.getStartDate(), rentDTO.getEndDate());
-                }
+                checkDateStartBeforeEnd(rentDTO.getStartDate(), rentDTO.getEndDate());
+                checkDateProperEnd(rentDTO.getEndDate());
 
                 rentFounded.get().setStartDate(rentDTO.getStartDate());
                 rentFounded.get().setEndDate(rentDTO.getEndDate());
+
                 rentRepository.save(rentFounded.get());
             } else {
                 if (rentDTO.getStartDate() != null) {
-                    if (!checkDate(rentDTO.getStartDate(), rentFounded.get().getEndDate())) {
-                        throw new RentDateInvalidException(rentDTO.getStartDate(), rentFounded.get().getEndDate());
-                    }
+                    checkDateStartBeforeEnd(rentDTO.getStartDate(), rentFounded.get().getEndDate());
 
                     rentFounded.get().setStartDate(rentDTO.getStartDate());
                 }
 
                 if (rentDTO.getEndDate() != null) {
-                    if (!checkDate(rentFounded.get().getStartDate(), rentDTO.getEndDate())) {
-                        throw new RentDateInvalidException(rentFounded.get().getStartDate(), rentDTO.getEndDate());
-                    }
+                    checkDateStartBeforeEnd(rentFounded.get().getStartDate(), rentDTO.getEndDate());
+                    checkDateProperEnd(rentDTO.getEndDate());
 
                     rentFounded.get().setEndDate(rentDTO.getEndDate());
                 }
@@ -158,32 +135,56 @@ public class RentService {
 
 
 
-    private boolean checkDate (String startDate, String endDate) {
-        Date start_date;
-        Date end_date;
-
+    private void checkDateStartBeforeEnd (String startDate, String endDate) {
         try {
-            start_date = new SimpleDateFormat("dd.MM.yyyy").parse(startDate);
-            end_date = new SimpleDateFormat("dd.MM.yyyy").parse(endDate);
+            Date start_date = new SimpleDateFormat("dd.MM.yyyy").parse(startDate);
+            Date end_date = new SimpleDateFormat("dd.MM.yyyy").parse(endDate);
 
-            return start_date.before(end_date);
+            if (start_date.after(end_date)) {
+                throw new RentDateInvalidException(startDate, endDate);
+            }
         } catch (ParseException exception) {
             throw new RuntimeException();
         }
     }
 
-    private boolean checkIfCarIsDisponible(RentDTO rentDTO) {
+    private void checkDateProperEnd(String endDate) {
+        try {
+            Date end_date = new SimpleDateFormat("dd.MM.yyyy").parse(endDate);
+
+            if (end_date.before(Calendar.getInstance().getTime())) {
+                throw new RentDateInvalidException(endDate);
+            }
+
+        } catch (ParseException exception) {
+            throw new RuntimeException();
+        }
+    }
+
+    private void checkIfDealershipHaveCar(DealershipDTO dealershipDTO, RentDTO rentDTO) {
+        if (!dealershipDTO.getCars().contains(rentDTO.getCar())) {
+            throw new CarNotFoundException(rentDTO);
+        }
+    }
+
+    private void checkIfDealershipHaveCar(RentDTO rentFounded, RentDTO rentDTO) {
+        DealershipDTO dealershipFounded = dealershipService.getDealership(rentFounded.getCar());
+
+        if (!dealershipFounded.getCars().contains(rentDTO.getCar())) {
+            throw new CarNotFoundException(rentDTO);
+        }
+    }
+
+    private void checkIfCarIsDisponible(RentDTO rentDTO) {
         Optional<List<Rent>> rentList = rentRepository.findByCar(CarAdapter.fromDTO(rentDTO.getCar()));
 
         if (rentList.isPresent()) {
             for (RentDTO rent : RentAdapter.toListDTO(rentList.get())) {
                 if (!checkCarIfCanBeRent(rentDTO, rent)) {
-                    return false;
+                    throw new RentCarIndisponibleException(rentDTO);
                 }
             }
         }
-
-        return true;
     }
 
     private boolean checkCarIfCanBeRent(RentDTO first, RentDTO second) {

@@ -11,4 +11,9 @@ public class RentDateInvalidException extends RuntimeException {
         message = "Start date is " + startDate + " and can not be after end date which is " + endDate ;
         debugMessage = "Change dates";
     }
+
+    public RentDateInvalidException(String endDate) {
+        message = "End date, which is: " + endDate + ", can not be before current date" ;
+        debugMessage = "Change date";
+    }
 }

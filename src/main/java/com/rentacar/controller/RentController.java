@@ -1,6 +1,5 @@
 package com.rentacar.controller;
 
-import com.rentacar.model.DealershipDTO;
 import com.rentacar.model.RentDTO;
 import com.rentacar.service.RentService;
 import org.springframework.http.ResponseEntity;
@@ -25,21 +24,21 @@ public class RentController {
     }
 
     @PostMapping("/{dealershipId}")
-    private ResponseEntity<RentDTO> createRent(@PathVariable Integer dealershipId, @Valid @RequestBody RentDTO rentDTO) {
+    private ResponseEntity<RentDTO> createRent(@PathVariable Integer dealershipId, @RequestBody @Valid RentDTO rentDTO) {
         return ResponseEntity.ok(rentService.createRent(dealershipId, rentDTO));
     }
 
     @PutMapping
-    private ResponseEntity<RentDTO> updateRent(@Valid RentDTO rentDTO) {
+    private ResponseEntity<RentDTO> updateRent(@RequestBody @Valid RentDTO rentDTO) {
         return ResponseEntity.ok(rentService.updateRent(rentDTO));
     }
 
     @PatchMapping
-    private ResponseEntity<RentDTO> patchRent(@Valid RentDTO rentDTO) {
+    private ResponseEntity<RentDTO> patchRent(@RequestBody RentDTO rentDTO) {
         return ResponseEntity.ok(rentService.patchRent(rentDTO));
     }
 
-    @DeleteMapping("/rent/{id}")
+    @DeleteMapping("/{id}")
     private ResponseEntity<RentDTO> deleteRent(@PathVariable Integer id) {
         return ResponseEntity.ok(rentService.deleteRent(id));
     }
