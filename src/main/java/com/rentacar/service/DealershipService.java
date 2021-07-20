@@ -71,6 +71,18 @@ public class DealershipService {
         }
     }
 
+    protected DealershipDTO getDealership(Integer id) {
+        Optional<Dealership> dealershipFounded = dealershipRepository.findById(id);
+
+        return dealershipFounded.map(DealershipAdapter::toDTO).orElse(null);
+    }
+
+    protected DealershipDTO getDealership(CarDTO carDTO) {
+        Optional<Dealership> dealershipFounded = dealershipRepository.findByCarsIn(Collections.singletonList(CarAdapter.fromDTO(carDTO)));
+
+        return dealershipFounded.map(DealershipAdapter::toDTO).orElse(null);
+    }
+
     @Validated(OnCreate.class)
     public DealershipDTO createDealership(@Valid DealershipDTO dealershipDTO) {
         if (countryService.getCountry(dealershipDTO.getCountry().getId(), dealershipDTO.getCountry().getName()) != null) {
