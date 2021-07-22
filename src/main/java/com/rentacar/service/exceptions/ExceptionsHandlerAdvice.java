@@ -3,10 +3,7 @@ package com.rentacar.service.exceptions;
 import com.rentacar.service.exceptions.car.*;
 import com.rentacar.service.exceptions.city.CityNotFoundException;
 import com.rentacar.service.exceptions.country.CountryNotFoundException;
-import com.rentacar.service.exceptions.dataIntegrity.NameUniqueConstraintException;
-import com.rentacar.service.exceptions.dataIntegrity.EmailUniqueConstraintException;
-import com.rentacar.service.exceptions.dataIntegrity.PhoneNumberUniqueConstraintException;
-import com.rentacar.service.exceptions.dataIntegrity.VinUniqueConstraintException;
+import com.rentacar.service.exceptions.dataIntegrity.*;
 import com.rentacar.service.exceptions.dealership.DealershipCityInvalidException;
 import com.rentacar.service.exceptions.dealership.DealershipNotFoundException;
 import com.rentacar.service.exceptions.rent.RentCarIndisponibleException;
@@ -68,6 +65,13 @@ public class ExceptionsHandlerAdvice extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ApiError onVinUniqueConstraintException(VinUniqueConstraintException exception) {
+        return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
+    }
+
+    @ExceptionHandler(UsernameUniqueException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ApiError onUsernameUniqueException(UsernameUniqueException exception) {
         return new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage(), exception.getDebugMessage());
     }
 

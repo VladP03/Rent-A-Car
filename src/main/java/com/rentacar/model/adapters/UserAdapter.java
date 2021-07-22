@@ -12,6 +12,7 @@ public class UserAdapter {
         return UserDTO.builder()
                 .ID(user.getID())
                 .username(user.getUsername())
+                .email(user.getEmail())
                 .password(user.getPassword())
                 .build();
     }
@@ -20,6 +21,7 @@ public class UserAdapter {
         return User.builder()
                 .ID(userDTO.getID())
                 .username(userDTO.getUsername())
+                .email(userDTO.getEmail())
                 .password(userDTO.getPassword())
                 .build();
     }
