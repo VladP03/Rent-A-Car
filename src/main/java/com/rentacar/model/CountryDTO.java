@@ -2,18 +2,15 @@ package com.rentacar.model;
 
 import com.rentacar.model.validations.OnCreate;
 import com.rentacar.model.validations.OnUpdate;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
+import javax.validation.constraints.*;
+import java.util.ArrayList;
 import java.util.List;
 
-@Builder
-@Getter @Setter
+@Getter
+@Setter
 public class CountryDTO {
     @Null(message = "Country's ID must be null", groups = {OnCreate.class})
     @NotNull(message = "Country's ID must be not null", groups = {OnUpdate.class})
@@ -24,9 +21,11 @@ public class CountryDTO {
     private String name;
 
     @NotEmpty(message = "Country's phone number can not be null or empty")
+    @Pattern(regexp = "[+]\\d{2}")
     private String phoneNumber;
 
-    private List<CityDTO> cityList;
+    private List<CityDTO> cityList = new ArrayList<>();
+
 
     @Override
     public boolean equals(Object obj) {

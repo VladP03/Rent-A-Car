@@ -71,12 +71,8 @@ public class CountryService {
     public CountryDTO createCountry(@Valid CountryDTO countryDTO) {
         nameToUpper(countryDTO);
 
-        if (countryDTO.getCityList() != null) {
-            for (CityDTO cityDTO : countryDTO.getCityList()) {
-                cityService.createCity(cityDTO);
-            }
-        } else {
-            countryDTO.setCityList(Collections.emptyList());
+        for (CityDTO cityDTO : countryDTO.getCityList()) {
+            cityService.createCity(cityDTO);
         }
 
         try {

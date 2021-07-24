@@ -2,15 +2,14 @@ package com.rentacar.model;
 
 import com.rentacar.model.validations.OnCreate;
 import com.rentacar.model.validations.OnUpdate;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.*;
 import java.util.*;
 
-@Builder
-@Getter @Setter
+@Getter
+@Setter
 public class DealershipDTO {
     @Null(message = "Dealership's ID must be null", groups = {OnCreate.class})
     @NotNull(message = "Dealership's ID must be not null", groups = {OnUpdate.class})
@@ -34,5 +33,5 @@ public class DealershipDTO {
     @Pattern(regexp = "^[0]\\d{9}")
     private String phoneNumber;
 
-    private List<CarDTO> cars;
+    private List<CarDTO> cars = new ArrayList<>();
 }

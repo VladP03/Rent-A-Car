@@ -9,15 +9,17 @@ import java.util.List;
 public class DealershipAdapter {
 
     public static DealershipDTO toDTO(Dealership dealership) {
-        return DealershipDTO.builder()
-                .ID(dealership.getID())
-                .name(dealership.getName())
-                .city(CityAdapter.toDTO(dealership.getCity()))
-                .country(CountryAdapter.toDTO(dealership.getCountry()))
-                .email(dealership.getEmail())
-                .phoneNumber(dealership.getPhoneNumber())
-                .cars(CarAdapter.toListDTO(dealership.getCars()))
-                .build();
+        DealershipDTO dealershipDTO = new DealershipDTO();
+
+        dealershipDTO.setID(dealership.getID());
+        dealershipDTO.setName(dealership.getName());
+        dealershipDTO.setCity(CityAdapter.toDTO(dealership.getCity()));
+        dealershipDTO.setCountry(CountryAdapter.toDTO(dealership.getCountry()));
+        dealershipDTO.setEmail(dealership.getEmail());
+        dealershipDTO.setPhoneNumber(dealership.getPhoneNumber());
+        dealershipDTO.setCars(CarAdapter.toListDTO(dealership.getCars()));
+
+        return dealershipDTO;
     }
 
     public static Dealership fromDTO (DealershipDTO dealershipDTO) {

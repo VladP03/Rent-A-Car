@@ -9,12 +9,14 @@ import java.util.List;
 public class CountryAdapter {
 
     public static CountryDTO toDTO(Country country) {
-        return CountryDTO.builder()
-                .id(country.getId())
-                .name(country.getName())
-                .phoneNumber(country.getPhoneNumber())
-                .cityList(CityAdapter.toListDTO(country.getCityList()))
-                .build();
+        CountryDTO countryDTO = new CountryDTO();
+
+        countryDTO.setId(country.getId());
+        countryDTO.setName(country.getName());
+        countryDTO.setPhoneNumber(country.getPhoneNumber());
+        countryDTO.setCityList(CityAdapter.toListDTO(country.getCityList()));
+
+        return countryDTO;
     }
 
     public static Country fromDTO (CountryDTO countryDTO) {

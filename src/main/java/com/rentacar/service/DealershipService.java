@@ -93,11 +93,7 @@ public class DealershipService {
                     throw new DealershipCityInvalidException(dealershipDTO);
                 }
 
-                if (dealershipDTO.getCars() != null) {
-                    createCar(dealershipDTO.getCars());
-                } else {
-                    dealershipDTO.setCars(Collections.emptyList());
-                }
+                createCar(dealershipDTO.getCars());
 
                 dealershipDTO.setPhoneNumber(rewritePhoneNumber(dealershipDTO.getPhoneNumber(), dealershipDTO.getCountry().getPhoneNumber()));
 
