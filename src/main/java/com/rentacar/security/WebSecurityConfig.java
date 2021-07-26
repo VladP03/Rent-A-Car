@@ -1,9 +1,7 @@
 package com.rentacar.security;
 
-import com.rentacar.service.exceptions.ApiError;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -27,6 +25,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+
+        // Our recommendation is to use CSRF protection for any request that could be processed by a browser by normal users.
+        // If you are only creating a service that is used by non-browser clients, you will likely want to disable CSRF protection.
+        // Reasons:
+        // 1. You are using another token mechanism.
+        // 2. You want to simplify interactions between a client and the server.
+        // Link: https://docs.spring.io/spring-security/site/docs/5.0.x/reference/html/csrf.html
         http.csrf().disable();
 
         http.authorizeRequests()
