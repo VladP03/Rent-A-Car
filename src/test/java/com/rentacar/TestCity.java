@@ -46,7 +46,7 @@ public class TestCity {
     /* getCity() */
 
     @Test
-    public void testCity_getCity_idAndBrandNameNull() {
+    public void testCity_getCity_idAndNameNull() {
         Mockito.when(cityRepositoryMock.findAll()).thenReturn(Collections.emptyList());
 
         List<CityDTO> cityDTOList = cityService.getCity(null, null);
@@ -80,9 +80,9 @@ public class TestCity {
 
         Mockito.when(cityRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.of(CityAdapter.fromDTO(cityDTO)));
 
-        List<CityDTO> carDTOList = cityService.getCity(cityDTO.getId(), null);
+        List<CityDTO> cityDTOList = cityService.getCity(cityDTO.getId(), null);
 
-        Assertions.assertEquals(Collections.singletonList(cityDTO), carDTOList);
+        Assertions.assertEquals(Collections.singletonList(cityDTO), cityDTOList);
     }
 
     @Test
@@ -99,14 +99,14 @@ public class TestCity {
     }
 
     @Test
-    public void testCity_getCity_IdAndBrandNameNotNull() {
+    public void testCity_getCity_IdAndNameNotNull() {
         cityDTO.setId(1);
 
         Mockito.when(cityRepositoryMock.findByIdAndName(Mockito.anyInt(), Mockito.anyString())).thenReturn(Optional.of(CityAdapter.fromDTO(cityDTO)));
 
-        List<CityDTO> carDTOList = cityService.getCity(cityDTO.getId(), cityDTO.getName());
+        List<CityDTO> cityDTOList = cityService.getCity(cityDTO.getId(), cityDTO.getName());
 
-        Assertions.assertEquals(Collections.singletonList(cityDTO), carDTOList);
+        Assertions.assertEquals(Collections.singletonList(cityDTO), cityDTOList);
     }
 
     @Test
