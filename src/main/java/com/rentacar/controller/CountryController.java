@@ -21,7 +21,7 @@ public class CountryController
 
     @GetMapping
     private ResponseEntity<List<CountryDTO>> getCountry(@RequestParam(required = false) Integer id, @RequestParam(required = false) String name) {
-        return ResponseEntity.ok(countryService.getCountry(id, name));
+        return ResponseEntity.ok(countryService.getListOfCars(id, name));
     }
 
     @PostMapping

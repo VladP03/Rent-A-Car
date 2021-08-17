@@ -51,7 +51,7 @@ public class TestCountry {
     public void testCountry_getCountry_idAndNameNull() {
         Mockito.when(countryRepositoryMock.findAll()).thenReturn(Collections.emptyList());
 
-        List<CountryDTO> countryDTOList = countryService.getCountry(null, null);
+        List<CountryDTO> countryDTOList = countryService.getListOfCars(null, null);
 
         Assertions.assertEquals(Collections.emptyList(), countryDTOList);
     }
@@ -60,7 +60,7 @@ public class TestCountry {
     public void testCountry_getCountry_idNull() {
         Mockito.when(countryRepositoryMock.findByName(Mockito.anyString())).thenReturn(Optional.of(CountryAdapter.fromDTO(countryDTO)));
 
-        List<CountryDTO> countryDTOList = countryService.getCountry(null, Mockito.anyString());
+        List<CountryDTO> countryDTOList = countryService.getListOfCars(null, Mockito.anyString());
 
         Assertions.assertEquals(Collections.singletonList(countryDTO), countryDTOList);
     }
@@ -71,7 +71,7 @@ public class TestCountry {
 
         CountryNotFoundException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 CountryNotFoundException.class,
-                () -> countryService.getCountry(null, countryDTO.getName()));
+                () -> countryService.getListOfCars(null, countryDTO.getName()));
 
         Assertions.assertEquals("Country not found. In database does not exists an country with name " + countryDTO.getName() + ".", exception.getMessage());
     }
@@ -82,7 +82,7 @@ public class TestCountry {
 
         Mockito.when(countryRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.of(CountryAdapter.fromDTO(countryDTO)));
 
-        List<CountryDTO> countryDTOList = countryService.getCountry(countryDTO.getId(), null);
+        List<CountryDTO> countryDTOList = countryService.getListOfCars(countryDTO.getId(), null);
 
         Assertions.assertEquals(Collections.singletonList(countryDTO), countryDTOList);
     }
@@ -95,7 +95,7 @@ public class TestCountry {
 
         CountryNotFoundException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 CountryNotFoundException.class,
-                () -> countryService.getCountry(countryDTO.getId(), null));
+                () -> countryService.getListOfCars(countryDTO.getId(), null));
 
         Assertions.assertEquals("Country not found. In database does not exists an country with id " + countryDTO.getId() + ".", exception.getMessage());
     }
@@ -106,7 +106,7 @@ public class TestCountry {
 
         Mockito.when(countryRepositoryMock.findByIdAndName(Mockito.anyInt(), Mockito.anyString())).thenReturn(Optional.of(CountryAdapter.fromDTO(countryDTO)));
 
-        List<CountryDTO> countryDTOList = countryService.getCountry(countryDTO.getId(), countryDTO.getName());
+        List<CountryDTO> countryDTOList = countryService.getListOfCars(countryDTO.getId(), countryDTO.getName());
 
         Assertions.assertEquals(Collections.singletonList(countryDTO), countryDTOList);
     }
@@ -119,7 +119,7 @@ public class TestCountry {
 
         CountryNotFoundException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 CountryNotFoundException.class,
-                () -> countryService.getCountry(countryDTO.getId(), countryDTO.getName()));
+                () -> countryService.getListOfCars(countryDTO.getId(), countryDTO.getName()));
 
         Assertions.assertEquals("Country not found. In database does not exists an country with id " + countryDTO.getId() + " and name " + countryDTO.getName() + ".", exception.getMessage());
     }
