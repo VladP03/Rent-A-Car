@@ -10,7 +10,6 @@ import com.rentacar.repository.car.Car;
 import com.rentacar.repository.car.CarRepository;
 import com.rentacar.service.exceptions.car.*;
 import com.rentacar.service.exceptions.dataIntegrity.VinUniqueConstraintException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
@@ -29,45 +28,31 @@ public class CarService {
 
 
 
-    public List<CarDTO> getCar(Integer id, String brandName) {
+    public List<CarDTO> getListOfCars(Integer id, String brandName) {
         if (id == null && brandName == null) {
             return CarAdapter.toListDTO(carRepository.findAll());
-        } else if (id != null && brandName != null) {
-
-            brandName = brandName.toUpperCase();
-            Optional<Car> carFounded = carRepository.findByIDAndBrandName(id, brandName);
-
-            if (carFounded.isPresent()) {
-                return Collections.singletonList(CarAdapter.toDTO(carFounded.get()));
-            } else {
-                throw new CarNotFoundException(id, brandName);
-            }
-        } else if (brandName != null) {
-
-            brandName = brandName.toUpperCase();
-            Optional<List<Car>> carsFounded = carRepository.findByBrandName(brandName);
-
-            if (carsFounded.isPresent()) {
-                return CarAdapter.toListDTO(carsFounded.get());
-            } else {
-                throw new CarNotFoundException(brandName);
-            }
-        } else {
-
-            Optional<Car> carFounded = carRepository.findById(id);
-
-            if (carFounded.isPresent()) {
-                return Collections.singletonList(CarAdapter.toDTO(carFounded.get()));
-            } else {
-                throw new CarNotFoundException(id);
-            }
         }
+
+        if (id != null && brandName != null) {
+            // all car's brand name in database are in upper case
+            brandName = brandName.toUpperCase();
+            return Collections.singletonList(getCar(id, brandName));
+        }
+
+        if (id == null) {
+            // all car's brand name in database are in upper case
+            brandName = brandName.toUpperCase();
+            return getCar(brandName);
+        }
+
+        return Collections.singletonList(getCar(id));
     }
 
     @Validated(OnCreate.class)
     public void createCar(@Valid CarDTO carDTO) {
-        namesToUpper(carDTO);
+        stringVariablesToUpper(carDTO);
 
+        checkIfVINExists(carDTO);
         checkFirstRegistration(carDTO);
         checkFuel(carDTO);
         checkGearbox(carDTO);
@@ -75,70 +60,33 @@ public class CarService {
 
     @Validated(OnUpdate.class)
     public void updateCar(@Valid CarDTO carDTO) {
-        Optional<Car> carFounded = carRepository.findById(carDTO.getID());
+        checkIfCarExists(carDTO);
 
-        if (carFounded.isPresent()) {
-            namesToUpper(carDTO);
-
-            checkFirstRegistration(carDTO);
-            checkFuel(carDTO);
-            checkGearbox(carDTO);
-        } else {
-            throw new CarNotFoundException(carDTO.getID());
-        }
+        checkIfVINExists(carDTO);
+        checkFirstRegistration(carDTO);
+        checkFuel(carDTO);
+        checkGearbox(carDTO);
     }
 
     @Validated(OnUpdate.class)
-    public void patchCar(CarDTO carDTO) {
-        Optional<Car> carFounded = carRepository.findById(carDTO.getID());
+    public CarDTO patchCar(CarDTO carDTO) {
+        CarDTO carToPatch = getCar(carDTO.getID());
 
-        if (carFounded.isPresent()) {
+        patchBrandName(carToPatch, carDTO);
+        patchName(carToPatch, carDTO);
+        patchVIN(carToPatch, carDTO);
+        patchFirstRegistration(carToPatch, carDTO);
+        patchEngineCapacity(carToPatch, carDTO);
+        patchFuel(carToPatch, carDTO);
+        patchGearBox(carToPatch, carDTO);
 
-            if (carDTO.getBrandName() != null) {
-                carFounded.get().setBrandName(carDTO.getBrandName());
-            }
+        stringVariablesToUpper(carToPatch);
 
-            if (carDTO.getName() != null) {
-                carFounded.get().setName(carDTO.getName());
-            }
-
-            if (carDTO.getVIN() != null) {
-                carFounded.get().setVIN(carDTO.getVIN());
-            }
-
-            if (carDTO.getFirstRegistration() != null) {
-                checkFirstRegistration(carDTO);
-                carFounded.get().setFirstRegistration(carDTO.getFirstRegistration());
-            }
-
-            if (carDTO.getEngineCapacity() != null) {
-                carFounded.get().setEngineCapacity(carDTO.getEngineCapacity());
-            }
-
-            if (carDTO.getFuel() != null) {
-                checkFuel(carDTO);
-                carFounded.get().setFuel(carDTO.getFuel());
-            }
-
-            if (carDTO.getGearbox() != null) {
-                checkGearbox(carDTO);
-                carFounded.get().setGearbox(carDTO.getGearbox());
-            }
-
-            CarDTO finalCar = CarAdapter.toDTO(carFounded.get());
-
-            namesToUpper(finalCar);
-        } else {
-            throw new CarNotFoundException(carDTO.getID());
-        }
+        return carToPatch;
     }
 
-    public void deleteCar(Integer id) {
-        Optional<Car> carFounded = carRepository.findById(id);
-
-        if (!carFounded.isPresent()) {
-            throw new CarNotFoundException(id);
-        }
+    public CarDTO deleteCar(Integer id) {
+        return getCar(id);
     }
 
 
@@ -146,125 +94,35 @@ public class CarService {
 
     @Validated(OnCreate.class)
     public CarDTO createCarAdmin(@Valid CarDTO carDTO) {
-        namesToUpper(carDTO);
+        createCar(carDTO);
 
-        checkFirstRegistration(carDTO);
-        checkFuel(carDTO);
-        checkGearbox(carDTO);
-
-        try {
-            return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carDTO)));
-        } catch (DataIntegrityViolationException exception) {
-            if (!isUniqueVIN(carDTO.getVIN())) {
-                throw new VinUniqueConstraintException(carDTO);
-            }
-
-            throw new DataIntegrityViolationException(Objects.requireNonNull(exception.getMessage()));
-        }
+        return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carDTO)));
     }
 
     @Validated(OnUpdate.class)
     public CarDTO updateCarAdmin(@Valid CarDTO carDTO) {
-        Optional<Car> carFounded = carRepository.findById(carDTO.getID());
+        updateCar(carDTO);
 
-        if (carFounded.isPresent()) {
-            namesToUpper(carDTO);
-
-            checkFirstRegistration(carDTO);
-            checkFuel(carDTO);
-            checkGearbox(carDTO);
-
-            try {
-                carRepository.save(CarAdapter.fromDTO(carDTO));
-            } catch (DataIntegrityViolationException exception) {
-                if (!isUniqueVIN(carDTO.getVIN())) {
-                    throw new VinUniqueConstraintException(carDTO);
-                }
-
-                throw new DataIntegrityViolationException(Objects.requireNonNull(exception.getMessage()));
-            }
-
-            return carDTO;
-        } else {
-            throw new CarNotFoundException(carDTO.getID());
-        }
+        return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carDTO)));
     }
 
     @Validated(OnUpdate.class)
     public CarDTO patchCarAdmin(CarDTO carDTO) {
-        Optional<Car> carFounded = carRepository.findById(carDTO.getID());
+        CarDTO carToPatch = patchCar(carDTO);
 
-        if (carFounded.isPresent()) {
-
-            if (carDTO.getBrandName() != null) {
-                carFounded.get().setBrandName(carDTO.getBrandName());
-            }
-
-            if (carDTO.getName() != null) {
-                carFounded.get().setName(carDTO.getName());
-            }
-
-            if (carDTO.getVIN() != null) {
-                carFounded.get().setVIN(carDTO.getVIN());
-            }
-
-            if (carDTO.getFirstRegistration() != null) {
-                checkFirstRegistration(carDTO);
-                carFounded.get().setFirstRegistration(carDTO.getFirstRegistration());
-            }
-
-            if (carDTO.getEngineCapacity() != null) {
-                carFounded.get().setEngineCapacity(carDTO.getEngineCapacity());
-            }
-
-            if (carDTO.getFuel() != null) {
-                checkFuel(carDTO);
-                carFounded.get().setFuel(carDTO.getFuel());
-            }
-
-            if (carDTO.getGearbox() != null) {
-                checkGearbox(carDTO);
-                carFounded.get().setGearbox(carDTO.getGearbox());
-            }
-
-            CarDTO finalCar = CarAdapter.toDTO(carFounded.get());
-            namesToUpper(finalCar);
-
-            try {
-                return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(finalCar)));
-            } catch (DataIntegrityViolationException exception) {
-                if (!isUniqueVIN(carDTO.getVIN())) {
-                    throw new VinUniqueConstraintException(carDTO);
-                }
-
-                throw new DataIntegrityViolationException(Objects.requireNonNull(exception.getMessage()));
-            }
-        } else {
-            throw new CarNotFoundException(carDTO.getID());
-        }
+        return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carToPatch)));
     }
 
     public CarDTO deleteCarAdmin(Integer id) {
-        Optional<Car> carFounded = carRepository.findById(id);
+        CarDTO carToDelete = deleteCar(id);
+        carRepository.deleteById(id);
 
-        if (carFounded.isPresent()) {
-            carRepository.deleteById(id);
-
-            return CarAdapter.toDTO(carFounded.get());
-        } else {
-            throw new CarNotFoundException(id);
-        }
+        return carToDelete;
     }
 
 
 
-    protected boolean isUniqueVIN(String VIN) {
-        Optional<Car> carFounded = carRepository.findByVIN(VIN);
-
-        return !carFounded.isPresent();
-    }
-
-
+    // Business logic
 
     private void checkFirstRegistration(CarDTO carDTO) {
         if (carDTO.getFirstRegistration() > Calendar.getInstance().get(Calendar.YEAR)) {
@@ -298,7 +156,113 @@ public class CarService {
         }
     }
 
-    private void namesToUpper(CarDTO carDTO) {
+
+
+    // Small functions
+
+    private CarDTO getCar(Integer id, String brandName) {
+        Optional<Car> carFounded = carRepository.findByIDAndBrandName(id, brandName);
+
+        if (carFounded.isPresent()) {
+            return CarAdapter.toDTO(carFounded.get());
+        } else {
+            throw new CarNotFoundException(id, brandName);
+        }
+    }
+
+
+    private CarDTO getCar(Integer id) {
+        Optional<Car> carFounded = carRepository.findById(id);
+
+        if (carFounded.isPresent()) {
+            return CarAdapter.toDTO(carFounded.get());
+        } else {
+            throw new CarNotFoundException(id);
+        }
+    }
+
+
+    private List<CarDTO> getCar(String brandName) {
+        Optional<List<Car>> carFounded = carRepository.findByBrandName(brandName);
+
+        if (carFounded.isPresent()) {
+            return CarAdapter.toListDTO(carFounded.get());
+        } else {
+            throw new CarNotFoundException(brandName);
+        }
+    }
+
+
+    private void checkIfVINExists(CarDTO carDTO) {
+        Optional<Car> carFounded = carRepository.findByVIN(carDTO.getVIN());
+
+        if (carFounded.isPresent()) {
+            throw new VinUniqueConstraintException(carDTO);
+        }
+    }
+
+
+    private void checkIfCarExists(CarDTO carDTO) {
+        Optional<Car> carFounded = carRepository.findById(carDTO.getID());
+
+        if (!carFounded.isPresent()) {
+            throw new CarNotFoundException(carDTO.getID());
+        }
+    }
+
+    private void patchBrandName(CarDTO destination, CarDTO source) {
+        if (source.getBrandName() != null) {
+            destination.setBrandName(source.getBrandName());
+        }
+    }
+
+
+    private void patchName(CarDTO destination, CarDTO source) {
+        if (source.getName() != null) {
+            destination.setName(source.getName());
+        }
+    }
+
+
+    private void patchVIN(CarDTO destination, CarDTO source) {
+        if (source.getVIN() != null) {
+            checkIfVINExists(source);
+            destination.setVIN(source.getVIN());
+        }
+    }
+
+
+    private void patchFirstRegistration(CarDTO destination, CarDTO source) {
+        if (source.getFirstRegistration() != null) {
+            checkFirstRegistration(source);
+            destination.setFirstRegistration(source.getFirstRegistration());
+        }
+    }
+
+
+    private void patchEngineCapacity(CarDTO destination, CarDTO source) {
+        if (source.getEngineCapacity() != null) {
+            source.setEngineCapacity(destination.getEngineCapacity());
+        }
+    }
+
+    private void patchFuel(CarDTO destination, CarDTO source) {
+        if (source.getFuel() != null) {
+            checkFuel(source);
+            destination.setFuel(destination.getFuel());
+        }
+    }
+
+    private void patchGearBox(CarDTO destination, CarDTO source) {
+        if (source.getGearbox() != null) {
+            checkGearbox(source);
+            destination.setGearbox(source.getGearbox());
+        }
+    }
+
+
+    // Make all Car's String variables to Upper for a better look in database
+    private void stringVariablesToUpper(CarDTO carDTO) {
         carDTO.setBrandName(carDTO.getBrandName().toUpperCase());
         carDTO.setName(carDTO.getName().toUpperCase());
         carDTO.setVIN(carDTO.getVIN().toUpperCase());

@@ -61,7 +61,7 @@ public class TestCar {
     public void testCar_getCar_idAndBrandNameNull() {
         Mockito.when(carRepositoryMock.findAll()).thenReturn(Collections.emptyList());
 
-        List<CarDTO> carDTOList = carService.getCar(null, null);
+        List<CarDTO> carDTOList = carService.getListOfCars(null, null);
 
         Assertions.assertEquals(Collections.emptyList(), carDTOList);
     }
@@ -70,7 +70,7 @@ public class TestCar {
     public void testCar_getCar_idNull() {
         Mockito.when(carRepositoryMock.findByBrandName(Mockito.anyString())).thenReturn(Optional.of(Collections.emptyList()));
 
-        List<CarDTO> carDTOList = carService.getCar(null, Mockito.anyString());
+        List<CarDTO> carDTOList = carService.getListOfCars(null, Mockito.anyString());
 
         Assertions.assertEquals(Collections.emptyList(), carDTOList);
     }
@@ -81,7 +81,7 @@ public class TestCar {
 
         CarNotFoundException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 CarNotFoundException.class,
-                () -> carService.getCar(null, carDTO.getBrandName()));
+                () -> carService.getListOfCars(null, carDTO.getBrandName()));
 
         Assertions.assertEquals("Car not found. In database does not exists an car with brand name " + carDTO.getBrandName() + ".", exception.getMessage());
     }
@@ -92,7 +92,7 @@ public class TestCar {
 
         Mockito.when(carRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.of(CarAdapter.fromDTO(carDTO)));
 
-        List<CarDTO> carDTOList = carService.getCar(carDTO.getID(), null);
+        List<CarDTO> carDTOList = carService.getListOfCars(carDTO.getID(), null);
 
         Assertions.assertEquals(Collections.singletonList(carDTO), carDTOList);
     }
@@ -105,7 +105,7 @@ public class TestCar {
 
         CarNotFoundException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 CarNotFoundException.class,
-                () -> carService.getCar(carDTO.getID(), null));
+                () -> carService.getListOfCars(carDTO.getID(), null));
 
         Assertions.assertEquals("Car not found. In database does not exists an car with id " + carDTO.getID() + ".", exception.getMessage());
     }
@@ -116,7 +116,7 @@ public class TestCar {
 
         Mockito.when(carRepositoryMock.findByIDAndBrandName(Mockito.anyInt(), Mockito.anyString())).thenReturn(Optional.of(CarAdapter.fromDTO(carDTO)));
 
-        List<CarDTO> carDTOList = carService.getCar(carDTO.getID(), carDTO.getBrandName());
+        List<CarDTO> carDTOList = carService.getListOfCars(carDTO.getID(), carDTO.getBrandName());
 
         Assertions.assertEquals(Collections.singletonList(carDTO), carDTOList);
     }
@@ -129,7 +129,7 @@ public class TestCar {
 
         CarNotFoundException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 CarNotFoundException.class,
-                () -> carService.getCar(carDTO.getID(), carDTO.getBrandName()));
+                () -> carService.getListOfCars(carDTO.getID(), carDTO.getBrandName()));
 
         Assertions.assertEquals("Car not found. In database does not exists an car with id " + carDTO.getID() + " and brand name " + carDTO.getBrandName() + ".", exception.getMessage());
     }

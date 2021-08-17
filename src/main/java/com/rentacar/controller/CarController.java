@@ -20,7 +20,7 @@ public class CarController {
 
     @GetMapping
     private ResponseEntity<List<CarDTO>> getCar(@RequestParam(required = false) Integer id, @RequestParam(required = false) String brandName ) {
-        return ResponseEntity.ok(carService.getCar(id, brandName));
+        return ResponseEntity.ok(carService.getListOfCars(id, brandName));
     }
 
     @PostMapping
