@@ -20,7 +20,7 @@ public class CityController {
 
     @GetMapping
     private ResponseEntity<List<CityDTO>> getCity(@RequestParam(required = false) Integer id, @RequestParam(required = false) String name) {
-        return ResponseEntity.ok(cityService.getCity(id, name));
+        return ResponseEntity.ok(cityService.getListOfCities(id, name));
     }
 
     @PostMapping

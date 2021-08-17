@@ -43,81 +43,81 @@ public class TestCity {
     }
 
 
-    /* getCity() */
+    /* getListOfCities() */
 
     @Test
-    public void testCity_getCity_idAndNameNull() {
+    public void testCity_getListOfCities_idAndNameNull() {
         Mockito.when(cityRepositoryMock.findAll()).thenReturn(Collections.emptyList());
 
-        List<CityDTO> cityDTOList = cityService.getCity(null, null);
+        List<CityDTO> cityDTOList = cityService.getListOfCities(null, null);
 
         Assertions.assertEquals(Collections.emptyList(), cityDTOList);
     }
 
     @Test
-    public void testCity_getCity_idNull() {
+    public void testCity_getListOfCities_idNull() {
         Mockito.when(cityRepositoryMock.findByName(Mockito.anyString())).thenReturn(Optional.of(CityAdapter.fromDTO(cityDTO)));
 
-        List<CityDTO> cityDTOList = cityService.getCity(null, Mockito.anyString());
+        List<CityDTO> cityDTOList = cityService.getListOfCities(null, Mockito.anyString());
 
         Assertions.assertEquals(Collections.singletonList(cityDTO), cityDTOList);
     }
 
     @Test
-    public void testCity_getCity_idNull_CityNotFound() {
+    public void testCity_getListOfCities_idNull_CityNotFound() {
         Mockito.when(cityRepositoryMock.findByName(Mockito.anyString())).thenReturn(Optional.empty());
 
         CityNotFoundException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 CityNotFoundException.class,
-                () -> cityService.getCity(null, cityDTO.getName()));
+                () -> cityService.getListOfCities(null, cityDTO.getName()));
 
         Assertions.assertEquals("City not found. In database does not exists an city with name " + cityDTO.getName() + ".", exception.getMessage());
     }
 
     @Test
-    public void testCity_getCity_nameNull() {
+    public void testCity_getListOfCities_nameNull() {
         cityDTO.setId(1);
 
         Mockito.when(cityRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.of(CityAdapter.fromDTO(cityDTO)));
 
-        List<CityDTO> cityDTOList = cityService.getCity(cityDTO.getId(), null);
+        List<CityDTO> cityDTOList = cityService.getListOfCities(cityDTO.getId(), null);
 
         Assertions.assertEquals(Collections.singletonList(cityDTO), cityDTOList);
     }
 
     @Test
-    public void testCity_getCity_nameNull_CityNotFound() {
+    public void testCity_getListOfCities_nameNull_CityNotFound() {
         cityDTO.setId(1);
 
         Mockito.when(cityRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.empty());
 
         CityNotFoundException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 CityNotFoundException.class,
-                () -> cityService.getCity(cityDTO.getId(), null));
+                () -> cityService.getListOfCities(cityDTO.getId(), null));
 
         Assertions.assertEquals("City not found. In database does not exists an city with id " + cityDTO.getId() + ".", exception.getMessage());
     }
 
     @Test
-    public void testCity_getCity_IdAndNameNotNull() {
+    public void testCity_getListOfCities_IdAndNameNotNull() {
         cityDTO.setId(1);
 
         Mockito.when(cityRepositoryMock.findByIdAndName(Mockito.anyInt(), Mockito.anyString())).thenReturn(Optional.of(CityAdapter.fromDTO(cityDTO)));
 
-        List<CityDTO> cityDTOList = cityService.getCity(cityDTO.getId(), cityDTO.getName());
+        List<CityDTO> cityDTOList = cityService.getListOfCities(cityDTO.getId(), cityDTO.getName());
 
         Assertions.assertEquals(Collections.singletonList(cityDTO), cityDTOList);
     }
 
     @Test
-    public void testCity_getCity_IdAndNameNotNull_CityNotFound() {
+    public void testCity_getListOfCities_IdAndNameNotNull_CityNotFound() {
         cityDTO.setId(1);
 
         Mockito.when(cityRepositoryMock.findByIdAndName(Mockito.anyInt(), Mockito.anyString())).thenReturn(Optional.empty());
 
         CityNotFoundException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 CityNotFoundException.class,
-                () -> cityService.getCity(cityDTO.getId(), cityDTO.getName()));
+                () -> cityService.getListOfCities(cityDTO.getId(), cityDTO.getName()));
 
         Assertions.assertEquals("City not found. In database does not exists an city with id " + cityDTO.getId() + " and name " + cityDTO.getName() + ".", exception.getMessage());
     }
