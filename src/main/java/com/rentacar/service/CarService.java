@@ -9,7 +9,7 @@ import com.rentacar.model.validations.OnUpdate;
 import com.rentacar.repository.car.Car;
 import com.rentacar.repository.car.CarRepository;
 import com.rentacar.service.exceptions.car.*;
-import com.rentacar.service.exceptions.dataIntegrity.VinUniqueConstraintException;
+import com.rentacar.service.validations.CarValidation;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
@@ -48,46 +48,24 @@ public class CarService {
         return Collections.singletonList(getCar(id));
     }
 
+
     @Validated(OnCreate.class)
     public void createCar(@Valid CarDTO carDTO) {
-        stringVariablesToUpper(carDTO);
-
-        checkIfVINExists(carDTO);
-        checkFirstRegistration(carDTO);
-        checkFuel(carDTO);
-        checkGearbox(carDTO);
+        new CarValidation(carDTO, carRepository).validateCreate();
     }
+
 
     @Validated(OnUpdate.class)
     public void updateCar(@Valid CarDTO carDTO) {
-        checkIfCarExists(carDTO);
-
-        checkIfVINExists(carDTO);
-        checkFirstRegistration(carDTO);
-        checkFuel(carDTO);
-        checkGearbox(carDTO);
+        new CarValidation(carDTO, carRepository).validateUpdate();
     }
+
 
     @Validated(OnUpdate.class)
-    public CarDTO patchCar(CarDTO carDTO) {
-        CarDTO carToPatch = getCar(carDTO.getID());
-
-        patchBrandName(carToPatch, carDTO);
-        patchName(carToPatch, carDTO);
-        patchVIN(carToPatch, carDTO);
-        patchFirstRegistration(carToPatch, carDTO);
-        patchEngineCapacity(carToPatch, carDTO);
-        patchFuel(carToPatch, carDTO);
-        patchGearBox(carToPatch, carDTO);
-
-        stringVariablesToUpper(carToPatch);
-
-        return carToPatch;
+    public void patchCar(CarDTO carDTO) {
+        new CarValidation(carDTO, carRepository).validatePatch();
     }
 
-    public CarDTO deleteCar(Integer id) {
-        return getCar(id);
-    }
 
 
     // Admin
@@ -99,6 +77,7 @@ public class CarService {
         return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carDTO)));
     }
 
+
     @Validated(OnUpdate.class)
     public CarDTO updateCarAdmin(@Valid CarDTO carDTO) {
         updateCar(carDTO);
@@ -106,54 +85,16 @@ public class CarService {
         return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carDTO)));
     }
 
+
     @Validated(OnUpdate.class)
     public CarDTO patchCarAdmin(CarDTO carDTO) {
-        CarDTO carToPatch = patchCar(carDTO);
+        patchCar(carDTO);
 
-        return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carToPatch)));
+        return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carDTO)));
     }
 
     public CarDTO deleteCarAdmin(Integer id) {
-        CarDTO carToDelete = deleteCar(id);
-        carRepository.deleteById(id);
-
-        return carToDelete;
-    }
-
-
-
-    // Business logic
-
-    private void checkFirstRegistration(CarDTO carDTO) {
-        if (carDTO.getFirstRegistration() > Calendar.getInstance().get(Calendar.YEAR)) {
-            throw new CarFirstRegistrationException(carDTO);
-        } else if (carDTO.getFirstRegistration() < Calendar.getInstance().get(Calendar.YEAR) - 10) {
-            throw new CarFirstRegistrationException(carDTO);
-        }
-    }
-
-    private void checkFuel(CarDTO carDTO) {
-        List<String> fuelType = new ArrayList<>();
-
-        fuelType.add("GAS");
-        fuelType.add("DIESEL");
-        fuelType.add("HYBRID");
-        fuelType.add("ELECTRIC");
-
-        if (!fuelType.contains(carDTO.getFuel().toUpperCase())) {
-            throw new CarFuelException(carDTO);
-        }
-    }
-
-    private void checkGearbox(CarDTO carDTO) {
-        List<String> gearBoxType = new ArrayList<>();
-
-        gearBoxType.add("MANUAL");
-        gearBoxType.add("AUTOMATIC");
-
-        if (!gearBoxType.contains(carDTO.getGearbox().toUpperCase())) {
-            throw new CarGearboxException(carDTO);
-        }
+        return new CarValidation(null, carRepository).validateDelete(id);
     }
 
 
@@ -190,83 +131,5 @@ public class CarService {
         } else {
             throw new CarNotFoundException(brandName);
         }
-    }
-
-
-    private void checkIfVINExists(CarDTO carDTO) {
-        Optional<Car> carFounded = carRepository.findByVIN(carDTO.getVIN());
-
-        if (carFounded.isPresent()) {
-            throw new VinUniqueConstraintException(carDTO);
-        }
-    }
-
-
-    private void checkIfCarExists(CarDTO carDTO) {
-        Optional<Car> carFounded = carRepository.findById(carDTO.getID());
-
-        if (!carFounded.isPresent()) {
-            throw new CarNotFoundException(carDTO.getID());
-        }
-    }
-
-    private void patchBrandName(CarDTO destination, CarDTO source) {
-        if (source.getBrandName() != null) {
-            destination.setBrandName(source.getBrandName());
-        }
-    }
-
-
-    private void patchName(CarDTO destination, CarDTO source) {
-        if (source.getName() != null) {
-            destination.setName(source.getName());
-        }
-    }
-
-
-    private void patchVIN(CarDTO destination, CarDTO source) {
-        if (source.getVIN() != null) {
-            checkIfVINExists(source);
-            destination.setVIN(source.getVIN());
-        }
-    }
-
-
-    private void patchFirstRegistration(CarDTO destination, CarDTO source) {
-        if (source.getFirstRegistration() != null) {
-            checkFirstRegistration(source);
-            destination.setFirstRegistration(source.getFirstRegistration());
-        }
-    }
-
-
-    private void patchEngineCapacity(CarDTO destination, CarDTO source) {
-        if (source.getEngineCapacity() != null) {
-            source.setEngineCapacity(destination.getEngineCapacity());
-        }
-    }
-
-    private void patchFuel(CarDTO destination, CarDTO source) {
-        if (source.getFuel() != null) {
-            checkFuel(source);
-            destination.setFuel(destination.getFuel());
-        }
-    }
-
-    private void patchGearBox(CarDTO destination, CarDTO source) {
-        if (source.getGearbox() != null) {
-            checkGearbox(source);
-            destination.setGearbox(source.getGearbox());
-        }
-    }
-
-
-    // Make all Car's String variables to Upper for a better look in database
-    private void stringVariablesToUpper(CarDTO carDTO) {
-        carDTO.setBrandName(carDTO.getBrandName().toUpperCase());
-        carDTO.setName(carDTO.getName().toUpperCase());
-        carDTO.setVIN(carDTO.getVIN().toUpperCase());
-        carDTO.setFuel(carDTO.getFuel().toUpperCase());
-        carDTO.setGearbox(carDTO.getGearbox().toUpperCase());
     }
 }

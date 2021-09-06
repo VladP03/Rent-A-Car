@@ -9,7 +9,7 @@ public class VinUniqueConstraintException extends RuntimeException {
     private final String debugMessage;
 
     public VinUniqueConstraintException(CarDTO carDTO) {
-        this.message = "VIN unique constraint violated on Car, name: " + carDTO.getBrandName() + ", " + carDTO.getName() + ", VIN: " + carDTO.getVIN() + " already exists.";
+        message = "VIN unique constraint violated on Car, name: " + carDTO.getBrandName() + ", " + carDTO.getName() + ", VIN: " + carDTO.getVIN() + " already exists.";
         debugMessage = "Change VIN";
     }
 }
