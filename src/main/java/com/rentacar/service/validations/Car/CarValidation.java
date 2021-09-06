@@ -6,8 +6,7 @@ import com.rentacar.repository.car.Car;
 import com.rentacar.repository.car.CarRepository;
 import com.rentacar.service.exceptions.car.CarNotFoundException;
 import com.rentacar.service.exceptions.dataIntegrity.VinUniqueConstraintException;
-import com.rentacar.service.validations.Car.BusinessLogic.CarValidateBusinessLogic;
-import com.rentacar.service.validations.Car.BusinessLogic.CarBusinessLogicImpl;
+import com.rentacar.service.validations.Car.BusinessLogic.CarBusinessLogic;
 
 import java.util.Optional;
 
@@ -15,22 +14,20 @@ public class CarValidation {
 
     private final CarDTO carDTO;
     private final CarRepository carRepository;
-    private final CarValidateBusinessLogic carBusinessLogic;
+    private final CarBusinessLogic carBusinessLogic = new CarBusinessLogic();
 
 
 
     public CarValidation(CarDTO carDTO, CarRepository carRepository) {
         this.carRepository = carRepository;
         this.carDTO = carDTO;
-
-        carBusinessLogic = new CarBusinessLogicImpl(carDTO);
     }
 
 
 
     public CarDTO validateCreate() {
         checkIfVINExists();
-        carBusinessLogic.validateBusinessLogic();
+        carBusinessLogic.validateBusinessLogic(carDTO);
 
         stringVariablesToUpper(carDTO);
 
@@ -41,7 +38,7 @@ public class CarValidation {
     public CarDTO validateUpdate() {
         checkIfCarIDExists();
         checkIfVINExists();
-        carBusinessLogic.validateBusinessLogic();
+        carBusinessLogic.validateBusinessLogic(carDTO);
 
         stringVariablesToUpper(carDTO);
 
@@ -61,7 +58,7 @@ public class CarValidation {
         patchGearBox(car.getGearbox());
 
         checkIfVINExists();
-        carBusinessLogic.validateBusinessLogic();
+        carBusinessLogic.validateBusinessLogic(carDTO);
 
         stringVariablesToUpper(carDTO);
 

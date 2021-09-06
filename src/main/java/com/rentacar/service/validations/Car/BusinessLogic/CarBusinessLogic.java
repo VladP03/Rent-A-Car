@@ -1,8 +1,11 @@
 package com.rentacar.service.validations.Car.BusinessLogic;
 
-interface CarBusinessLogic {
+import com.rentacar.model.CarDTO;
+import com.rentacar.service.validations.Car.BusinessLogic.ChainOfResponsability.ChainOfResponsability;
 
-    void validateFirstRegistration();
-    void validateFuel();
-    void validateGearBox();
+public class CarBusinessLogic {
+
+    public void validateBusinessLogic(CarDTO carDTO) {
+        new ChainOfResponsability().returnFirstChain().execute(carDTO);
+    }
 }
