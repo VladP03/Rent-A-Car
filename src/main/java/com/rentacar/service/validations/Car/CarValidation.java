@@ -1,36 +1,36 @@
-package com.rentacar.service.validations;
+package com.rentacar.service.validations.Car;
 
 import com.rentacar.model.CarDTO;
 import com.rentacar.model.adapters.CarAdapter;
 import com.rentacar.repository.car.Car;
 import com.rentacar.repository.car.CarRepository;
-import com.rentacar.service.exceptions.car.CarFirstRegistrationException;
-import com.rentacar.service.exceptions.car.CarFuelException;
-import com.rentacar.service.exceptions.car.CarGearboxException;
 import com.rentacar.service.exceptions.car.CarNotFoundException;
 import com.rentacar.service.exceptions.dataIntegrity.VinUniqueConstraintException;
+import com.rentacar.service.validations.Car.BusinessLogic.CarValidateBusinessLogic;
+import com.rentacar.service.validations.Car.BusinessLogic.CarBusinessLogicImpl;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
 import java.util.Optional;
 
 public class CarValidation {
 
     private final CarDTO carDTO;
     private final CarRepository carRepository;
+    private final CarValidateBusinessLogic carBusinessLogic;
+
 
 
     public CarValidation(CarDTO carDTO, CarRepository carRepository) {
         this.carRepository = carRepository;
         this.carDTO = carDTO;
+
+        carBusinessLogic = new CarBusinessLogicImpl(carDTO);
     }
 
 
 
     public CarDTO validateCreate() {
         checkIfVINExists();
-        validateBusinessLogic();
+        carBusinessLogic.validateBusinessLogic();
 
         stringVariablesToUpper(carDTO);
 
@@ -41,7 +41,7 @@ public class CarValidation {
     public CarDTO validateUpdate() {
         checkIfCarIDExists();
         checkIfVINExists();
-        validateBusinessLogic();
+        carBusinessLogic.validateBusinessLogic();
 
         stringVariablesToUpper(carDTO);
 
@@ -61,7 +61,7 @@ public class CarValidation {
         patchGearBox(car.getGearbox());
 
         checkIfVINExists();
-        validateBusinessLogic();
+        carBusinessLogic.validateBusinessLogic();
 
         stringVariablesToUpper(carDTO);
 
@@ -77,53 +77,6 @@ public class CarValidation {
         return carToDelete;
     }
 
-
-
-    // Validate business logic
-
-    private void validateBusinessLogic() {
-        checkFirstRegistration();
-        checkFuel();
-        checkGearbox();
-    }
-
-
-
-    // Business logic
-
-    private void checkFirstRegistration() {
-        if (carDTO.getFirstRegistration() > Calendar.getInstance().get(Calendar.YEAR)) {
-            throw new CarFirstRegistrationException(carDTO);
-        } else if (carDTO.getFirstRegistration() < Calendar.getInstance().get(Calendar.YEAR) - 10) {
-            throw new CarFirstRegistrationException(carDTO);
-        }
-    }
-
-
-    private void checkFuel() {
-        List<String> fuelType = new ArrayList<>();
-
-        fuelType.add("GAS");
-        fuelType.add("DIESEL");
-        fuelType.add("HYBRID");
-        fuelType.add("ELECTRIC");
-
-        if (!fuelType.contains(carDTO.getFuel().toUpperCase())) {
-            throw new CarFuelException(carDTO);
-        }
-    }
-
-
-    private void checkGearbox() {
-        List<String> gearBoxType = new ArrayList<>();
-
-        gearBoxType.add("MANUAL");
-        gearBoxType.add("AUTOMATIC");
-
-        if (!gearBoxType.contains(carDTO.getGearbox().toUpperCase())) {
-            throw new CarGearboxException(carDTO);
-        }
-    }
 
 
     // Small functions

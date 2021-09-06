@@ -9,7 +9,7 @@ import com.rentacar.model.validations.OnUpdate;
 import com.rentacar.repository.car.Car;
 import com.rentacar.repository.car.CarRepository;
 import com.rentacar.service.exceptions.car.*;
-import com.rentacar.service.validations.CarValidation;
+import com.rentacar.service.validations.Car.CarValidation;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
