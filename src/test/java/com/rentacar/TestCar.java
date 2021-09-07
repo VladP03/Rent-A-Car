@@ -278,7 +278,7 @@ public class TestCar {
 
         CarNotFoundException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 CarNotFoundException.class,
-                () -> carService.deleteCarAdmin(carDTO.getID()));
+                () -> carService.deleteCarAdmin(carDTO));
 
         Assertions.assertEquals("Car not found. In database does not exists an car with id " + carDTO.getID() + ".", exception.getMessage());
     }

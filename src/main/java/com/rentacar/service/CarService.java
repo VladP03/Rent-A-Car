@@ -73,7 +73,6 @@ public class CarService {
     @Validated(OnCreate.class)
     public CarDTO createCarAdmin(@Valid CarDTO carDTO) {
         createCar(carDTO);
-
         return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carDTO)));
     }
 
@@ -81,7 +80,6 @@ public class CarService {
     @Validated(OnUpdate.class)
     public CarDTO updateCarAdmin(@Valid CarDTO carDTO) {
         updateCar(carDTO);
-
         return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carDTO)));
     }
 
@@ -89,12 +87,13 @@ public class CarService {
     @Validated(OnUpdate.class)
     public CarDTO patchCarAdmin(CarDTO carDTO) {
         patchCar(carDTO);
-
         return CarAdapter.toDTO(carRepository.save(CarAdapter.fromDTO(carDTO)));
     }
 
-    public CarDTO deleteCarAdmin(Integer id) {
-        return new CarValidation(null, carRepository).validateDelete(id);
+
+    @Validated(OnUpdate.class)
+    public CarDTO deleteCarAdmin(CarDTO carDTO) {
+        return new CarValidation(carDTO, carRepository).validateDelete();
     }
 
 

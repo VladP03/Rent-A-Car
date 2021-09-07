@@ -21,57 +21,35 @@ public class CarValidation {
     public CarValidation(CarDTO carDTO, CarRepository carRepository) {
         this.carRepository = carRepository;
         this.carDTO = carDTO;
+
+        stringVariablesToUpper();
     }
 
 
 
-    public CarDTO validateCreate() {
+    public void validateCreate() {
         checkIfVINExists();
         carBusinessLogic.validateBusinessLogic(carDTO);
-
-        stringVariablesToUpper(carDTO);
-
-        return carDTO;
     }
 
 
-    public CarDTO validateUpdate() {
-        checkIfCarIDExists();
+    public void validateUpdate() {
+        checkIfIDExists();
         checkIfVINExists();
         carBusinessLogic.validateBusinessLogic(carDTO);
-
-        stringVariablesToUpper(carDTO);
-
-        return carDTO;
     }
 
 
-    public CarDTO validatePatch() {
-        CarDTO car = getCar(carDTO.getID());
-
-        patchBrandName(car.getBrandName());
-        patchName(car.getName());
-        patchVIN(car.getVIN());
-        patchFirstRegistration(car.getFirstRegistration());
-        patchEngineCapacity(car.getEngineCapacity());
-        patchFuel(car.getFuel());
-        patchGearBox(car.getGearbox());
-
-        checkIfVINExists();
+    public void validatePatch() {
+        CarDTO car = getCar();
+        patchCar(car);
         carBusinessLogic.validateBusinessLogic(carDTO);
-
-        stringVariablesToUpper(carDTO);
-
-        return carDTO;
     }
 
 
-    public CarDTO validateDelete(Integer id) {
-        CarDTO carToDelete = getCar(id);
-
-        carRepository.deleteById(id);
-
-        return carToDelete;
+    public CarDTO validateDelete() {
+        carRepository.deleteById(carDTO.getID());
+        return carDTO;
     }
 
 
@@ -87,7 +65,7 @@ public class CarValidation {
     }
 
 
-    private void checkIfCarIDExists() {
+    private void checkIfIDExists() {
         Optional<Car> carFounded = carRepository.findById(carDTO.getID());
 
         if (!carFounded.isPresent()) {
@@ -96,16 +74,28 @@ public class CarValidation {
     }
 
 
+    private void patchCar(CarDTO car) {
+        patchBrandName(car.getBrandName());
+        patchName(car.getName());
+        patchVIN(car.getVIN());
+        patchFirstRegistration(car.getFirstRegistration());
+        patchEngineCapacity(car.getEngineCapacity());
+        patchFuel(car.getFuel());
+        patchGearBox(car.getGearbox());
+        patchMileage(car.getMileage());
+    }
+
+
 
     // Get functions
 
-    private CarDTO getCar(Integer id) {
-        Optional<Car> carFounded = carRepository.findById(id);
+    private CarDTO getCar() {
+        Optional<Car> carFounded = carRepository.findById(carDTO.getID());
 
         if (carFounded.isPresent()) {
             return CarAdapter.toDTO(carFounded.get());
         } else {
-            throw new CarNotFoundException(id);
+            throw new CarNotFoundException(carDTO.getID());
         }
     }
 
@@ -130,6 +120,8 @@ public class CarValidation {
     private void patchVIN(String newVIN) {
         if (carDTO.getVIN() == null) {
             carDTO.setVIN(newVIN);
+        } else if (!carDTO.getVIN().equals(newVIN)) {
+            checkIfVINExists();
         }
     }
 
@@ -147,11 +139,13 @@ public class CarValidation {
         }
     }
 
+
     private void patchFuel(String newFuel) {
         if (carDTO.getFuel() == null) {
             carDTO.setFuel(newFuel);
         }
     }
+
 
     private void patchGearBox(String newGearBox) {
         if (carDTO.getGearbox() == null) {
@@ -160,13 +154,34 @@ public class CarValidation {
     }
 
 
+    private void patchMileage(Double newMileage) {
+        if (carDTO.getMileage() == null) {
+            carDTO.setMileage(newMileage);
+        }
+    }
+
+
 
     // Make all Car's String variables to Upper for a better look in database
-    private void stringVariablesToUpper(CarDTO carDTO) {
-        carDTO.setBrandName(carDTO.getBrandName().toUpperCase());
-        carDTO.setName(carDTO.getName().toUpperCase());
-        carDTO.setVIN(carDTO.getVIN().toUpperCase());
-        carDTO.setFuel(carDTO.getFuel().toUpperCase());
-        carDTO.setGearbox(carDTO.getGearbox().toUpperCase());
+    private void stringVariablesToUpper() {
+        if (carDTO.getBrandName() != null) {
+            carDTO.setBrandName(carDTO.getBrandName().toUpperCase());
+        }
+
+        if (carDTO.getName() != null) {
+            carDTO.setName(carDTO.getName().toUpperCase());
+        }
+
+        if (carDTO.getVIN() != null) {
+            carDTO.setVIN(carDTO.getVIN().toUpperCase());
+        }
+
+        if (carDTO.getFuel() != null) {
+            carDTO.setFuel(carDTO.getFuel().toUpperCase());
+        }
+
+        if (carDTO.getGearbox() != null) {
+            carDTO.setGearbox(carDTO.getGearbox().toUpperCase());
+        }
     }
 }
