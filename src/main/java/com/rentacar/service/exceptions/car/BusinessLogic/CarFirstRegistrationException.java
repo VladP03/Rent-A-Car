@@ -1,29 +1,28 @@
-package com.rentacar.service.exceptions.car;
+package com.rentacar.service.exceptions.car.BusinessLogic;
 
 import com.rentacar.model.CarDTO;
+import com.rentacar.service.validations.Car.BusinessLogic.ChainOfResponsability.FirstRegistration;
 import lombok.Getter;
 
-import java.util.Calendar;
-
 @Getter
-public class CarFirstRegistrationException extends RuntimeException{
+public class CarFirstRegistrationException extends CarBusinessLogicException {
     private String message = "Car first registration can not be ";
-    private final String debugMessage;
+    private String debugMessage;
 
-    private final int maxYear = Calendar.getInstance().get(Calendar.YEAR);
-    private final int minYear = maxYear - 10;
+
+    public CarFirstRegistrationException() {}
 
     public CarFirstRegistrationException(CarDTO carDTO) {
         olderOrGreater(carDTO.getFirstRegistration());
 
         message += " Error on the following car: " + carDTO.getBrandName() + " " + carDTO.getName() + ", with VIN: " + carDTO.getVIN() + ".";
-        debugMessage = "Car's first registration must be between " + minYear + " and " + maxYear;
+        debugMessage = "Car's first registration must be between " + FirstRegistration.MIN_YEAR + " and " + FirstRegistration.MAX_YEAR;
     }
 
     private void olderOrGreater(Integer firstRegistration) {
-        if (firstRegistration > maxYear) {
+        if (firstRegistration > FirstRegistration.MAX_YEAR) {
             message += "greater than current year, year introduced: " + firstRegistration + ".";
-        } else if (firstRegistration < minYear) {
+        } else if (firstRegistration < FirstRegistration.MIN_YEAR) {
             message += "older than 10 years, year introduced: " + firstRegistration + ".";
         }
     }

@@ -1,14 +1,20 @@
 package com.rentacar.service.validations.Car.BusinessLogic.ChainOfResponsability;
 
-import com.rentacar.model.CarDTO;
-import com.rentacar.service.exceptions.car.CarFuelException;
+import com.rentacar.service.exceptions.car.BusinessLogic.CarFuelException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-class Fuel implements Chain {
+public class Fuel implements Chain {
 
+    private final String carFuel;
     private Chain nextInChain;
+
+
+    public Fuel(String carFuel) {
+        this.carFuel = carFuel;
+    }
+
 
     @Override
     public void setNextChain(Chain nextChain) {
@@ -16,7 +22,7 @@ class Fuel implements Chain {
     }
 
     @Override
-    public void execute(CarDTO carDTO) {
+    public void execute() {
         List<String> fuelType = new ArrayList<>();
 
         fuelType.add("GAS");
@@ -24,12 +30,12 @@ class Fuel implements Chain {
         fuelType.add("HYBRID");
         fuelType.add("ELECTRIC");
 
-        if (!fuelType.contains(carDTO.getFuel().toUpperCase())) {
-            throw new CarFuelException(carDTO);
+        if (!fuelType.contains(carFuel.toUpperCase())) {
+            throw new CarFuelException();
         }
 
         if (nextInChain != null) {
-            nextInChain.execute(carDTO);
+            nextInChain.execute();
         }
     }
 }

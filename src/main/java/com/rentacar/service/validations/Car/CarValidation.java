@@ -11,7 +11,6 @@ public class CarValidation {
 
     private final CarDTO carDTO;
     private final CarRepository carRepository;
-    private final CarBusinessLogic carBusinessLogic = new CarBusinessLogic();
 
 
 
@@ -26,25 +25,20 @@ public class CarValidation {
 
     public void validateCreate() {
         validateVIN();
-        carBusinessLogic.validateBusinessLogic(carDTO);
+        checkBusinessLogic();
     }
 
 
     public void validateUpdate() {
         checkIfIDExists();
-
-        if (haveANewVIN()) {
-            validateVIN();
-        }
-
-        carBusinessLogic.validateBusinessLogic(carDTO);
+        checkUpdateVIN();
+        checkBusinessLogic();
     }
 
 
     public void validatePatch(CarDTO carForPatch) {
         patchCar(carForPatch);
-
-        carBusinessLogic.validateBusinessLogic(carDTO);
+        checkBusinessLogic();
     }
 
 
@@ -56,11 +50,23 @@ public class CarValidation {
 
     // Small functions
 
+    private void checkBusinessLogic() {
+        CarBusinessLogic.validateBusinessLogic(carDTO);
+    }
+
+
     private void checkIfIDExists() {
         boolean isPresent = carRepository.findByID(carDTO.getID());
 
         if (!isPresent) {
             throw new CarNotFoundException(carDTO.getID());
+        }
+    }
+
+
+    private void checkUpdateVIN() {
+        if (haveANewVIN()) {
+            validateVIN();
         }
     }
 

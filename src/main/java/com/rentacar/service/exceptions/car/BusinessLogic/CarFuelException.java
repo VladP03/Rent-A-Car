@@ -1,12 +1,15 @@
-package com.rentacar.service.exceptions.car;
+package com.rentacar.service.exceptions.car.BusinessLogic;
 
 import com.rentacar.model.CarDTO;
 import lombok.Getter;
 
 @Getter
-public class CarFuelException extends RuntimeException{
+public class CarFuelException extends CarBusinessLogicException {
     private String message = "Car fuel is incorrect.";
-    private final String debugMessage;
+    private String debugMessage;
+
+
+    public CarFuelException() {}
 
     public CarFuelException(CarDTO carDTO) {
         message += " Fuel introduced: " + carDTO.getFuel() + ".";

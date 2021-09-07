@@ -1,13 +1,23 @@
 package com.rentacar.service.validations.Car.BusinessLogic.ChainOfResponsability;
 
-import com.rentacar.model.CarDTO;
-import com.rentacar.service.exceptions.car.CarFirstRegistrationException;
+import com.rentacar.service.exceptions.car.BusinessLogic.CarFirstRegistrationException;
 
 import java.util.Calendar;
 
-class FirstRegistration implements Chain {
+public class FirstRegistration implements Chain {
+
+    private final int carRegistration;
+
+    public static final int MAX_YEAR = Calendar.getInstance().get(Calendar.YEAR);
+    public static final int MIN_YEAR = MAX_YEAR - 10;
 
     private Chain nextInChain;
+
+
+    public FirstRegistration(int carRegistration) {
+        this.carRegistration = carRegistration;
+    }
+
 
     @Override
     public void setNextChain(Chain nextChain) {
@@ -15,15 +25,17 @@ class FirstRegistration implements Chain {
     }
 
     @Override
-    public void execute(CarDTO carDTO) {
-        if (carDTO.getFirstRegistration() > Calendar.getInstance().get(Calendar.YEAR)) {
-            throw new CarFirstRegistrationException(carDTO);
-        } else if (carDTO.getFirstRegistration() < Calendar.getInstance().get(Calendar.YEAR) - 10) {
-            throw new CarFirstRegistrationException(carDTO);
+    public void execute() {
+        if (carRegistration > MAX_YEAR) {
+            throw new CarFirstRegistrationException();
+        } else if (carRegistration < MIN_YEAR) {
+            throw new CarFirstRegistrationException();
         }
 
         if (nextInChain != null) {
-            nextInChain.execute(carDTO);
+            nextInChain.execute();
         }
     }
+
+
 }

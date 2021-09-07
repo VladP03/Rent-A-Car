@@ -1,6 +1,9 @@
 package com.rentacar.service.exceptions;
 
 import com.rentacar.service.exceptions.car.*;
+import com.rentacar.service.exceptions.car.BusinessLogic.CarFirstRegistrationException;
+import com.rentacar.service.exceptions.car.BusinessLogic.CarFuelException;
+import com.rentacar.service.exceptions.car.BusinessLogic.CarGearboxException;
 import com.rentacar.service.exceptions.city.CityNotFoundException;
 import com.rentacar.service.exceptions.country.CountryNotFoundException;
 import com.rentacar.service.exceptions.dataIntegrity.*;

@@ -1,12 +1,15 @@
-package com.rentacar.service.exceptions.car;
+package com.rentacar.service.exceptions.car.BusinessLogic;
 
 import com.rentacar.model.CarDTO;
 import lombok.Getter;
 
 @Getter
-public class CarGearboxException extends RuntimeException{
+public class CarGearboxException extends CarBusinessLogicException {
     private String message = "Car gearbox is incorrect.";
-    private final String debugMessage;
+    private String debugMessage;
+
+
+    public CarGearboxException() {}
 
     public CarGearboxException(CarDTO carDTO) {
         message += " Gearbox introduced: " + carDTO.getGearbox() + ".";
