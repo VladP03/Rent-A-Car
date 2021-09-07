@@ -33,8 +33,8 @@ public class CityController {
         return ResponseEntity.ok(cityService.updateCityAdmin(cityDTO));
     }
 
-    @DeleteMapping("/{id}")
-    private ResponseEntity<CityDTO> deleteCity(@PathVariable Integer id) {
-        return ResponseEntity.ok(cityService.deleteCityAdmin(id));
+    @DeleteMapping
+    private ResponseEntity<CityDTO> deleteCity(@Valid @RequestBody CityDTO cityDTO) {
+        return ResponseEntity.ok(cityService.deleteCityAdmin(cityDTO));
     }
 }

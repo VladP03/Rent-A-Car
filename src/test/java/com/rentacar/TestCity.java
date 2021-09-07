@@ -150,7 +150,7 @@ public class TestCity {
 
         CityNotFoundException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 CityNotFoundException.class,
-                () -> cityService.deleteCityAdmin(cityDTO.getId())
+                () -> cityService.deleteCityAdmin(cityDTO)
         );
 
         Assertions.assertEquals("City not found. In database does not exists an city with id " + cityDTO.getId() + ".", exception.getMessage());
