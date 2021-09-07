@@ -11,6 +11,8 @@ public interface CarRepository extends JpaRepository<Car, Integer> {
     boolean findByVIN(String VIN);
     boolean findByID(Integer ID);
 
+    boolean findByVINAndID(String VIN, Integer id);
+
     Optional<List<Car>> findByBrandName(String brandName);
     Optional<Car> findByIDAndBrandName(Integer id, String brandName);
 }

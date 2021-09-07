@@ -1,15 +1,11 @@
 package com.rentacar.service.validations.Car;
 
 import com.rentacar.model.CarDTO;
-import com.rentacar.model.adapters.CarAdapter;
-import com.rentacar.repository.car.Car;
 import com.rentacar.repository.car.CarRepository;
 import com.rentacar.service.exceptions.car.CarNotFoundException;
 import com.rentacar.service.exceptions.dataIntegrity.VinUniqueConstraintException;
 import com.rentacar.service.validations.Car.BusinessLogic.CarBusinessLogic;
 import com.rentacar.service.validations.Car.UniqueConstraint.VINUniqueConstraint;
-
-import java.util.Optional;
 
 public class CarValidation {
 
@@ -45,9 +41,8 @@ public class CarValidation {
     }
 
 
-    public void validatePatch() {
-        CarDTO car = getCar();
-        patchCar(car);
+    public void validatePatch(CarDTO carForPatch) {
+        patchCar(carForPatch);
 
         carBusinessLogic.validateBusinessLogic(carDTO);
     }
@@ -71,9 +66,7 @@ public class CarValidation {
 
 
     private boolean haveANewVIN() {
-        Optional<Car> carFounded = carRepository.findById(carDTO.getID());
-
-        return !carFounded.get().getVIN().equals(carDTO.getVIN());
+        return !carRepository.findByVINAndID(carDTO.getVIN(), carDTO.getID());
     }
 
 
@@ -82,20 +75,6 @@ public class CarValidation {
             VINUniqueConstraint.checkConstraint(carDTO.getVIN(), carRepository);
         } catch (VinUniqueConstraintException exception) {
             throw new VinUniqueConstraintException(carDTO);
-        }
-    }
-
-
-
-    // Get functions
-
-    private CarDTO getCar() {
-        Optional<Car> carFounded = carRepository.findById(carDTO.getID());
-
-        if (carFounded.isPresent()) {
-            return CarAdapter.toDTO(carFounded.get());
-        } else {
-            throw new CarNotFoundException(carDTO.getID());
         }
     }
 

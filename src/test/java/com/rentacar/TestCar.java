@@ -8,7 +8,6 @@ import com.rentacar.service.exceptions.car.CarFirstRegistrationException;
 import com.rentacar.service.exceptions.car.CarFuelException;
 import com.rentacar.service.exceptions.car.CarGearboxException;
 import com.rentacar.service.exceptions.car.CarNotFoundException;
-import com.rentacar.service.validations.Car.CarValidation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -202,7 +201,6 @@ public class TestCar {
         carDTO.setFirstRegistration(1);
 
         Mockito.when(carRepositoryMock.findByID(Mockito.anyInt())).thenReturn(true);
-        Mockito.when(carRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.of(CarAdapter.fromDTO(carDTO)));
 
         CarFirstRegistrationException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 CarFirstRegistrationException.class,
@@ -217,7 +215,6 @@ public class TestCar {
         carDTO.setFirstRegistration(9999);
 
         Mockito.when(carRepositoryMock.findByID(Mockito.anyInt())).thenReturn(true);
-        Mockito.when(carRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.of(CarAdapter.fromDTO(carDTO)));
 
         CarFirstRegistrationException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 CarFirstRegistrationException.class,
@@ -232,7 +229,6 @@ public class TestCar {
         carDTO.setFuel("testFuel");
 
         Mockito.when(carRepositoryMock.findByID(Mockito.anyInt())).thenReturn(true);
-        Mockito.when(carRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.of(CarAdapter.fromDTO(carDTO)));
 
         CarFuelException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 CarFuelException.class,
@@ -247,7 +243,6 @@ public class TestCar {
         carDTO.setGearbox("testGearbox");
 
         Mockito.when(carRepositoryMock.findByID(Mockito.anyInt())).thenReturn(true);
-        Mockito.when(carRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.of(CarAdapter.fromDTO(carDTO)));
 
         CarGearboxException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 CarGearboxException.class,
@@ -278,8 +273,6 @@ public class TestCar {
     @Test
     public void testCar_deleteCar_CarNotFoundException() {
         carDTO.setID(1);
-
-        Mockito.when(carRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.empty());
 
         CarNotFoundException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 CarNotFoundException.class,

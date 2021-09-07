@@ -63,7 +63,8 @@ public class CarService {
 
     @Validated(OnUpdate.class)
     public void patchCar(CarDTO carDTO) {
-        new CarValidation(carDTO, carRepository).validatePatch();
+        CarDTO carToPatch = getCar(carDTO.getID());
+        new CarValidation(carDTO, carRepository).validatePatch(carToPatch);
     }
 
 
