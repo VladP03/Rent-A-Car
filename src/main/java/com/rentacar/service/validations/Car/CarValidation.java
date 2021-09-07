@@ -7,6 +7,7 @@ import com.rentacar.repository.car.CarRepository;
 import com.rentacar.service.exceptions.car.CarNotFoundException;
 import com.rentacar.service.exceptions.dataIntegrity.VinUniqueConstraintException;
 import com.rentacar.service.validations.Car.BusinessLogic.CarBusinessLogic;
+import com.rentacar.service.validations.Car.UniqueConstraint.VINUniqueConstraint;
 
 import java.util.Optional;
 
@@ -28,14 +29,18 @@ public class CarValidation {
 
 
     public void validateCreate() {
-        checkIfVINExists();
+        validateVIN();
         carBusinessLogic.validateBusinessLogic(carDTO);
     }
 
 
     public void validateUpdate() {
         checkIfIDExists();
-        checkIfVINExists();
+
+        if (haveANewVIN()) {
+            validateVIN();
+        }
+
         carBusinessLogic.validateBusinessLogic(carDTO);
     }
 
@@ -43,46 +48,41 @@ public class CarValidation {
     public void validatePatch() {
         CarDTO car = getCar();
         patchCar(car);
+
         carBusinessLogic.validateBusinessLogic(carDTO);
     }
 
 
-    public CarDTO validateDelete() {
-        carRepository.deleteById(carDTO.getID());
-        return carDTO;
+    public void validateDelete() {
+        checkIfIDExists();
     }
 
 
 
     // Small functions
 
-    private void checkIfVINExists() {
-        Optional<Car> carFounded = carRepository.findByVIN(carDTO.getVIN());
-
-        if (carFounded.isPresent()) {
-            throw new VinUniqueConstraintException(carDTO);
-        }
-    }
-
-
     private void checkIfIDExists() {
-        Optional<Car> carFounded = carRepository.findById(carDTO.getID());
+        boolean isPresent = carRepository.findByID(carDTO.getID());
 
-        if (!carFounded.isPresent()) {
+        if (!isPresent) {
             throw new CarNotFoundException(carDTO.getID());
         }
     }
 
 
-    private void patchCar(CarDTO car) {
-        patchBrandName(car.getBrandName());
-        patchName(car.getName());
-        patchVIN(car.getVIN());
-        patchFirstRegistration(car.getFirstRegistration());
-        patchEngineCapacity(car.getEngineCapacity());
-        patchFuel(car.getFuel());
-        patchGearBox(car.getGearbox());
-        patchMileage(car.getMileage());
+    private boolean haveANewVIN() {
+        Optional<Car> carFounded = carRepository.findById(carDTO.getID());
+
+        return !carFounded.get().getVIN().equals(carDTO.getVIN());
+    }
+
+
+    private void validateVIN() {
+        try {
+            VINUniqueConstraint.checkConstraint(carDTO.getVIN(), carRepository);
+        } catch (VinUniqueConstraintException exception) {
+            throw new VinUniqueConstraintException(carDTO);
+        }
     }
 
 
@@ -103,6 +103,18 @@ public class CarValidation {
 
     // Patch functions
 
+    private void patchCar(CarDTO car) {
+        patchBrandName(car.getBrandName());
+        patchName(car.getName());
+        patchVIN(car.getVIN());
+        patchFirstRegistration(car.getFirstRegistration());
+        patchEngineCapacity(car.getEngineCapacity());
+        patchFuel(car.getFuel());
+        patchGearBox(car.getGearbox());
+        patchMileage(car.getMileage());
+    }
+
+
     private void patchBrandName(String newBrandName) {
         if (carDTO.getBrandName() == null) {
             carDTO.setBrandName(newBrandName);
@@ -120,8 +132,8 @@ public class CarValidation {
     private void patchVIN(String newVIN) {
         if (carDTO.getVIN() == null) {
             carDTO.setVIN(newVIN);
-        } else if (!carDTO.getVIN().equals(newVIN)) {
-            checkIfVINExists();
+        } else if (haveANewVIN()) {
+            validateVIN();
         }
     }
 

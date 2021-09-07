@@ -8,6 +8,7 @@ import com.rentacar.service.exceptions.car.CarFirstRegistrationException;
 import com.rentacar.service.exceptions.car.CarFuelException;
 import com.rentacar.service.exceptions.car.CarGearboxException;
 import com.rentacar.service.exceptions.car.CarNotFoundException;
+import com.rentacar.service.validations.Car.CarValidation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -200,6 +201,7 @@ public class TestCar {
         carDTO.setID(1);
         carDTO.setFirstRegistration(1);
 
+        Mockito.when(carRepositoryMock.findByID(Mockito.anyInt())).thenReturn(true);
         Mockito.when(carRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.of(CarAdapter.fromDTO(carDTO)));
 
         CarFirstRegistrationException exception = org.junit.jupiter.api.Assertions.assertThrows(
@@ -214,6 +216,7 @@ public class TestCar {
         carDTO.setID(1);
         carDTO.setFirstRegistration(9999);
 
+        Mockito.when(carRepositoryMock.findByID(Mockito.anyInt())).thenReturn(true);
         Mockito.when(carRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.of(CarAdapter.fromDTO(carDTO)));
 
         CarFirstRegistrationException exception = org.junit.jupiter.api.Assertions.assertThrows(
@@ -228,6 +231,7 @@ public class TestCar {
         carDTO.setID(1);
         carDTO.setFuel("testFuel");
 
+        Mockito.when(carRepositoryMock.findByID(Mockito.anyInt())).thenReturn(true);
         Mockito.when(carRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.of(CarAdapter.fromDTO(carDTO)));
 
         CarFuelException exception = org.junit.jupiter.api.Assertions.assertThrows(
@@ -242,6 +246,7 @@ public class TestCar {
         carDTO.setID(1);
         carDTO.setGearbox("testGearbox");
 
+        Mockito.when(carRepositoryMock.findByID(Mockito.anyInt())).thenReturn(true);
         Mockito.when(carRepositoryMock.findById(Mockito.anyInt())).thenReturn(Optional.of(CarAdapter.fromDTO(carDTO)));
 
         CarGearboxException exception = org.junit.jupiter.api.Assertions.assertThrows(

@@ -93,7 +93,9 @@ public class CarService {
 
     @Validated(OnUpdate.class)
     public CarDTO deleteCarAdmin(CarDTO carDTO) {
-        return new CarValidation(carDTO, carRepository).validateDelete();
+        new CarValidation(carDTO, carRepository).validateDelete();
+        carRepository.delete(CarAdapter.fromDTO(carDTO));
+        return carDTO;
     }
 
 

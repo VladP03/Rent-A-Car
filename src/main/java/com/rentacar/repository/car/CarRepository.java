@@ -8,7 +8,9 @@ import java.util.List;
 
 @Repository
 public interface CarRepository extends JpaRepository<Car, Integer> {
-    Optional<Car> findByVIN(String VIN);
+    boolean findByVIN(String VIN);
+    boolean findByID(Integer ID);
+
     Optional<List<Car>> findByBrandName(String brandName);
     Optional<Car> findByIDAndBrandName(Integer id, String brandName);
 }
