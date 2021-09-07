@@ -11,11 +11,11 @@ public class PhoneNumberUniqueConstraintException extends RuntimeException{
 
     public PhoneNumberUniqueConstraintException(CountryDTO countryDTO) {
         this.message = "Phone number unique constraint violated on Country, phone number: " + countryDTO.getPhoneNumber() + " already exists.";
-        debugMessage = "Change email";
+        debugMessage = "Change phone number";
     }
 
     public PhoneNumberUniqueConstraintException(DealershipDTO dealershipDTO) {
         this.message = "Phone number unique constraint violated on Dealership, phone number: " + dealershipDTO.getPhoneNumber() + " already exists.";
-        debugMessage = "Change email";
+        debugMessage = "Change phone number";
     }
 }
