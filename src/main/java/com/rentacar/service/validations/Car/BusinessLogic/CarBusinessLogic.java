@@ -14,9 +14,7 @@ public class CarBusinessLogic {
         } catch (CarBusinessLogicException exception) {
             try {
                 throw exception.getClass().getConstructor(CarDTO.class).newInstance(carDTO);
-            } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException ex) {
-
-            }
+            } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException ignored) {}
         }
     }
 }

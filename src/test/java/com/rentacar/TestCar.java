@@ -200,7 +200,7 @@ public class TestCar {
         carDTO.setID(1);
         carDTO.setFirstRegistration(1);
 
-        Mockito.when(carRepositoryMock.findByID(Mockito.anyInt())).thenReturn(true);
+        Mockito.when(carRepositoryMock.existsById(Mockito.anyInt())).thenReturn(true);
 
         CarFirstRegistrationException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 CarFirstRegistrationException.class,
@@ -214,7 +214,7 @@ public class TestCar {
         carDTO.setID(1);
         carDTO.setFirstRegistration(9999);
 
-        Mockito.when(carRepositoryMock.findByID(Mockito.anyInt())).thenReturn(true);
+        Mockito.when(carRepositoryMock.existsById(Mockito.anyInt())).thenReturn(true);
 
         CarFirstRegistrationException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 CarFirstRegistrationException.class,
@@ -228,7 +228,7 @@ public class TestCar {
         carDTO.setID(1);
         carDTO.setFuel("testFuel");
 
-        Mockito.when(carRepositoryMock.findByID(Mockito.anyInt())).thenReturn(true);
+        Mockito.when(carRepositoryMock.existsById(Mockito.anyInt())).thenReturn(true);
 
         CarFuelException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 CarFuelException.class,
@@ -242,7 +242,7 @@ public class TestCar {
         carDTO.setID(1);
         carDTO.setGearbox("testGearbox");
 
-        Mockito.when(carRepositoryMock.findByID(Mockito.anyInt())).thenReturn(true);
+        Mockito.when(carRepositoryMock.existsById(Mockito.anyInt())).thenReturn(true);
 
         CarGearboxException exception = org.junit.jupiter.api.Assertions.assertThrows(
                 CarGearboxException.class,

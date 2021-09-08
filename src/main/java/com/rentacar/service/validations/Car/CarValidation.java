@@ -42,11 +42,6 @@ public class CarValidation {
     }
 
 
-    public void validateDelete() {
-        checkIfIDExists();
-    }
-
-
 
     // Small functions
 
@@ -56,7 +51,7 @@ public class CarValidation {
 
 
     private void checkIfIDExists() {
-        boolean isPresent = carRepository.findByID(carDTO.getID());
+        boolean isPresent = carRepository.existsById(carDTO.getID());
 
         if (!isPresent) {
             throw new CarNotFoundException(carDTO.getID());
@@ -72,7 +67,7 @@ public class CarValidation {
 
 
     private boolean haveANewVIN() {
-        return !carRepository.findByVINAndID(carDTO.getVIN(), carDTO.getID());
+        return !carRepository.existsByVINAndID(carDTO.getVIN(), carDTO.getID());
     }
 
 

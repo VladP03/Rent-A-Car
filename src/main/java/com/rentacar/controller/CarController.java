@@ -33,9 +33,9 @@ public class CarController {
         return ResponseEntity.ok(carService.updateCarAdmin(carDTO));
     }
 
-    @DeleteMapping
-    private ResponseEntity<CarDTO> deleteCar(@Valid @RequestBody CarDTO carDTO) {
-        return ResponseEntity.ok(carService.deleteCarAdmin(carDTO));
+    @DeleteMapping("/{id}")
+    private ResponseEntity<CarDTO> deleteCar(@PathVariable Integer id) {
+        return ResponseEntity.ok(carService.deleteCarAdmin(id));
     }
 
     @PatchMapping

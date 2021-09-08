@@ -6,7 +6,7 @@ import com.rentacar.service.exceptions.dataIntegrity.VinUniqueConstraintExceptio
 public class VINUniqueConstraint {
 
     public static void checkConstraint(String VIN, CarRepository carRepository) throws VinUniqueConstraintException{
-        boolean isPresent = carRepository.findByVIN(VIN);
+        boolean isPresent = carRepository.existsByVIN(VIN);
 
         if (isPresent) {
             throw new VinUniqueConstraintException();
